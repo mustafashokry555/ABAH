@@ -15,7 +15,7 @@ class AuthController extends Controller
         $credentials = $request->only(['userId', 'password']);
         $credentials['password'] = base64_encode($credentials['password']);
 
-        $result = DB::select('EXEC usp_apiLoginRegNo ?, ?', [
+        $result = DB::select('EXEC usp_app_apiLoginRegNo ?, ?', [
             $credentials['userId'],
             $credentials['password'],
         ]);
@@ -28,8 +28,7 @@ class AuthController extends Controller
             $patient = Patient::where('Registration_No', $credentials['userId'])->first();
             $patient->tokens()->delete();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
-            $result[0]->expirationTime = $expirationTime;
-            return response()->json(['token' => $token, 'user' => $result[0]]);
+            return response()->json(['token' => $token, 'status' => 200]);
         }
 
         // return response()->json(['error' => 'Invalid credentials'], 401);

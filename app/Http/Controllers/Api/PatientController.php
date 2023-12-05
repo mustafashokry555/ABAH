@@ -10,22 +10,13 @@ use Illuminate\Support\Facades\Validator;
 class PatientController extends Controller
 {
     function insurance(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'patient_id' => 'required|integer',
-            'hospital_id' => 'required|integer',
-            'month' => 'required',
-            'year' => 'required',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        if(!isset($request->user()->PatientId)){
+            return response()->json(['errors' => 'The patient id field is required.', 'status' => 422]);
         }
         try {
-            $data = DB::select('usp_apiGetPatientInsuranceDetails ?, ?, ?, ?', [
-                $request->patient_id,
-                $request->hospital_id,
-                $request->month,
-                $request->year,
+            $data = DB::select('usp_app_apiPatientInsuranceDetails ?', [
+                $request->user()->PatientId,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -35,18 +26,10 @@ class PatientController extends Controller
     }
 
     function radiologyReports(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'patient_id' => 'required|integer',
-            'hospital_id' => 'required|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
-        }
         try {
             $data = DB::select('usp_apiGetAllRadioDatewise ?, ?', [
-                $request->patient_id,
-                $request->hospital_id,
+                $request->user()->PatientId,
+                $request->user()->Hospital_ID,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -56,16 +39,9 @@ class PatientController extends Controller
     }
 
     function labResults(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'patient_id' => 'required|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
-        }
         try {
             $data = DB::select('usp_apigetLabPatwiseResults ?', [
-                $request->patient_id,
+                $request->user()->PatientId,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -75,18 +51,10 @@ class PatientController extends Controller
     }
 
     function prescriptions(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'patient_id' => 'required|integer',
-            'hospital_id' => 'required|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
-        }
         try {
             $data = DB::select('usp_apiGetAllPrescriptions ?, ?', [
-                $request->patient_id,
-                $request->hospital_id,
+                $request->user()->PatientId,
+                $request->user()->Hospital_ID,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -97,8 +65,6 @@ class PatientController extends Controller
 
     function bills(Request $request) {
         $validator = Validator::make($request->all(), [
-            'patient_id' => 'required|integer',
-            'hospital_id' => 'required|integer',
             'month' => 'required',
             'year' => 'required',
         ]);
@@ -108,10 +74,26 @@ class PatientController extends Controller
         }
         try {
             $data = DB::select('usp_apiGetAllInvoices ?, ?, ?, ?', [
-                $request->patient_id,
-                $request->hospital_id,
+                $request->user()->Registration_No,
+                $request->user()->Hospital_ID,
                 $request->month,
                 $request->year,
+            ]);
+            return response()->json(['data' => $data, 'status' => 200]);
+        } catch (\Throwable $th) {
+            // return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+
+        }
+    }
+
+    function visit_history(Request $request) {
+
+        try {
+            $data = DB::select('usp_api_GetAllVisitList ?, ?, ?', [
+                $request->user()->PatientId,
+                $request->user()->Hospital_ID,
+                NULL,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {

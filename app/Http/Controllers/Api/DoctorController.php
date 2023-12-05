@@ -8,17 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class DoctorController extends Controller
 {
-    function index()  {
-        try {
-            $data = DB::select('usp_apiGetAllDoctors');
-            return response()->json(['data' => $data, 'status' => 200]);
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
-        }
-    }
-
-    function department(Request $request) {
+    function index(Request $request) {
         try {
             $data = DB::select('usp_apiGetAllDoctors');
             if(isset($request->search) && isset($request->dep_id)){

@@ -26,35 +26,31 @@ Response Status
     500 - DataBase Errors
 */
 
-
 // Auth Routs
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->post('/user', function (Request $request) {
-    return $request->user();
+// departments Routs
+Route::group(['prefix' => 'departments'], function () {
+    Route::get('/all', [DepartmentController::class,'index']);
 });
 
+// doctors Routs
+Route::group(['prefix' => 'doctors'], function () {
+    Route::get('/all', [DoctorController::class,'index']);
+});
+
+//Garded Routs
 Route::middleware('auth:sanctum')->group(function () {
-    // departments Routs
-    Route::group(['prefix' => 'departments'], function () {
-    
-        Route::get('/all', [DepartmentController::class,'index']);
-    });
-    
-    // doctors Routs
-    Route::group(['prefix' => 'doctors'], function () {
-    
-        Route::get('/all', [DoctorController::class,'index']);
-        Route::get('/department', [DoctorController::class,'department']);
-    });
-    
     // patients Routs
-    Route::group(['prefix' => 'patients'], function () {
-    
+    Route::group(['prefix' => 'patient'], function () {
+        Route::post('/info', function (Request $request) {
+            return response()->json(['data' => $request->user(), 'status' => 200]);
+        });
         Route::get('/insurance', [PatientController::class,'insurance']);
         Route::get('/radio/reports', [PatientController::class,'radiologyReports']);
         Route::get('/lab/results', [PatientController::class,'labResults']);
         Route::get('/prescriptions', [PatientController::class,'prescriptions']);
         Route::get('/bills', [PatientController::class,'bills']);
+        Route::get('/visit_history', [PatientController::class,'visit_history']);
     });
 });
