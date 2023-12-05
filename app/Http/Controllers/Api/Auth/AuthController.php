@@ -19,14 +19,19 @@ class AuthController extends Controller
             $credentials['userId'],
             $credentials['password'],
         ]);
-        if (!empty($result)) {
+        if (isset($result[0]->Id) && in_array($result[0]->Id, [-1, -2, -3])) {
+            // No details available or OTP count exceeded
+            return response()->json(['errors' => $result[0]->Msg, 'status' => 401]);
+        } elseif (isset($result[0]->Registration_No) && $result[0]->Registration_No == $credentials['userId']) {
+
             $expirationTime = now()->addDays(7);
             $patient = Patient::where('Registration_No', $credentials['userId'])->first();
             $patient->tokens()->delete();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
-            return response()->json(['token' => $token, 'user' => $result[0], 'user1' => $expirationTime]);
+            $result[0]->expirationTime = $expirationTime;
+            return response()->json(['token' => $token, 'user' => $result[0]]);
         }
 
-        return response()->json(['error' => 'Invalid credentials'], 401);
+        // return response()->json(['error' => 'Invalid credentials'], 401);
     }
 }
