@@ -49,7 +49,11 @@ class AuthController extends Controller
             'Registration_No' => $Registration_No,
             'PatientType_ID' => $request->PatientType_ID,
             'PatientSubType_ID' => $request->PatientSubType_ID,
-            'InsertedByUserID'=> $InsertedByUserID,
+            //defultValue
+            'InsertedByUserID' => $InsertedByUserID,
+            'InsertedMacName' => 'flutterApp',
+            'InsertedMacID' => '10',
+            'InsertedIPAddress' => '192.168.1.1',
         ]);
         if($patient->save()){
             $expirationTime = now()->addDays(7);

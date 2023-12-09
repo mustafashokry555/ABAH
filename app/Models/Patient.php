@@ -13,7 +13,8 @@ class Patient extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens;
     protected $table = 'patient';
     protected $primaryKey = 'Registration_No';
-    public $timestamps = false;
+    const CREATED_AT = 'InsertedON';
+    const UPDATED_AT = 'UpdatedOn';
     protected $fillable = [
         'NationalNo',
         'First_Name',
@@ -22,11 +23,16 @@ class Patient extends Authenticatable
         'Mobile',
         'Registration_No',
         'PatientSubType_ID',
-        'InsertedByUserID',
         'Gender',
         'Nationality',
         'PatientType_ID',
         'patient_password',
+        
+        //defult
+        'InsertedByUserID',
+        'InsertedMacName',
+        'InsertedMacID',
+        'InsertedIPAddress',
     ];
     protected $hidden = [
         'patient_password',
