@@ -7,9 +7,54 @@ use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'NationalNo' => 'required|unique:Patient',
+            'First_Name' => 'required',
+            'Middle_Name' => 'required',
+            'Last_Name' => 'required',
+            'Mobile' => 'required|unique:Patient',
+            'Registration_No' => 'required|unique:Patient',
+            // 'Date_Of_Birth' => 'required',
+            'Gender' => 'required',
+            'MaritalStatus' => 'required',
+            'patient_password' => 'required|min:6|confirmed',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+
+        //Patient Creation
+        $patient = Patient::create([
+            'NationalNo' => $request->NationalNo,
+            'First_Name' => $request->First_Name,
+            'Middle_Name' => $request->Middle_Name,
+            'Last_Name' => $request->Last_Name,
+            'Mobile' => $request->Mobile,
+            'Registration_No' => $request->Registration_No,
+            'PatientType_ID' => '1',
+            'PatientSubType_ID' => '1',
+            'InsertedByUserID'=> '1',
+            'Gender'=>'1',
+            'Nationality'=>'1',
+            'patient_password' => base64_encode($request->patient_password),
+        ]);
+        if($patient->save()){
+            $expirationTime = now()->addDays(7);
+            $patient = Patient::where('Registration_No', $request->Registration_No)->first();
+            $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
+            return response()->json(['token' => $token, 'patient' => $patient, 'status' => 200]);    
+        }else{
+            return response()->json(['errors' => 'DB Error', 'status' => 500]);    
+        }
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->only(['userId', 'password']);
@@ -26,7 +71,7 @@ class AuthController extends Controller
 
             $expirationTime = now()->addDays(7);
             $patient = Patient::where('Registration_No', $credentials['userId'])->first();
-            $patient->tokens()->delete();
+            // $patient->tokens()->delete();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
             return response()->json(['token' => $token, 'status' => 200]);
         }

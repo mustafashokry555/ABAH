@@ -28,6 +28,7 @@ Response Status
 
 // Auth Routs
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 // departments Routs
 Route::group(['prefix' => 'departments'], function () {
