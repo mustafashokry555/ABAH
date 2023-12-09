@@ -15,13 +15,12 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'NationalNo' => 'required|unique:Patient',
+            'NationalNo' => 'required|unique:Patient|numeric|digits:10',
             'First_Name' => 'required',
             'Middle_Name' => 'required',
             'Last_Name' => 'required',
-            'Mobile' => 'required|unique:Patient',
-            'Registration_No' => 'required|unique:Patient',
-            // 'Date_Of_Birth' => 'required',
+            'Mobile' => 'required|unique:Patient|numeric|digits:9',
+            'Date_Of_Birth' => 'required|date_format:Y-m-d|before:today',
             'Gender' => 'required',
             'MaritalStatus' => 'required',
             'patient_password' => 'required|min:6|confirmed',
@@ -29,6 +28,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
+        return $request;
 
         //Patient Creation
         $patient = Patient::create([
