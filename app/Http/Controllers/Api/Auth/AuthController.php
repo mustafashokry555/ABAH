@@ -20,16 +20,21 @@ class AuthController extends Controller
             'Middle_Name' => 'required',
             'Last_Name' => 'required',
             'Mobile' => 'required|unique:Patient|numeric|digits:9',
-            'Date_Of_Birth' => 'required|date_format:Y-m-d|before:today',
-            'Gender' => 'required',
-            'MaritalStatus' => 'required',
+            'Date_Of_Birth' => 'required|date_format:Y-m-d|before:tomorrow',
+            'Gender' => 'required|integer|exists:Gender_Mst,Gender_ID,Active,1',
+            'MaritalStatus' => 'required|integer|exists:MaritalStatus_Mst,Status_ID,Deactive,0',
+            'Nationality' => 'required|integer|exists:Nationality_Master,NationalityId,Deactive,0', 
             'patient_password' => 'required|min:6|confirmed',
+            'PatientType_ID' => 'required|integer|exists:PatientType_mst,PatientType_ID,Deactive,0', 
+            'PatientSubType_ID' => 'required|integer|exists:PatientSubType_Mst,PatientSubType_ID,Deactive,0', 
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
-        return $request;
-
+        $Registration_No = Patient::orderBy('Registration_No', 'DESC')->pluck('Registration_No')->toArray();
+        $Registration_No =  max($Registration_No)+1;
+        $InsertedByUserID = DB::table('User_Mst')->where('UserName', 'mobileApp')->pluck('UserID')->first();
+        // return $Registration_No ;
         //Patient Creation
         $patient = Patient::create([
             'NationalNo' => $request->NationalNo,
@@ -37,17 +42,18 @@ class AuthController extends Controller
             'Middle_Name' => $request->Middle_Name,
             'Last_Name' => $request->Last_Name,
             'Mobile' => $request->Mobile,
-            'Registration_No' => $request->Registration_No,
-            'PatientType_ID' => '1',
-            'PatientSubType_ID' => '1',
-            'InsertedByUserID'=> '1',
-            'Gender'=>'1',
-            'Nationality'=>'1',
+            'Gender'=> $request->Gender,
+            'MaritalStatus' => $request->MaritalStatus,
+            'Nationality'=> $request->Nationality,
             'patient_password' => base64_encode($request->patient_password),
+            'Registration_No' => $Registration_No,
+            'PatientType_ID' => $request->PatientType_ID,
+            'PatientSubType_ID' => $request->PatientSubType_ID,
+            'InsertedByUserID'=> $InsertedByUserID,
         ]);
         if($patient->save()){
             $expirationTime = now()->addDays(7);
-            $patient = Patient::where('Registration_No', $request->Registration_No)->first();
+            $patient = Patient::where('Registration_No', $Registration_No)->first();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
             return response()->json(['token' => $token, 'patient' => $patient, 'status' => 200]);    
         }else{

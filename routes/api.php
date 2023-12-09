@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,9 @@ Route::group(['prefix' => 'departments'], function () {
 Route::group(['prefix' => 'doctors'], function () {
     Route::get('/all', [DoctorController::class,'index']);
 });
+
+//Basic Data
+Route::get('/basicData', [SettingController::class,'index']);
 
 //Garded Routs
 Route::middleware('auth:sanctum')->group(function () {
