@@ -23,6 +23,7 @@ class Patient extends Authenticatable
         'Mobile',
         'Registration_No',
         'PatientSubType_ID',
+        'Date_Of_Birth',
         'Gender',
         'Nationality',
         'PatientType_ID',
