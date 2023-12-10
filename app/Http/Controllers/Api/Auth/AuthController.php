@@ -49,6 +49,7 @@ class AuthController extends Controller
             'Registration_No' => $Registration_No,
             'PatientType_ID' => $request->PatientType_ID,
             'PatientSubType_ID' => $request->PatientSubType_ID,
+            'Date_Of_Birth' => $request->Date_Of_Birth,
             //defultValue
             'InsertedByUserID' => $InsertedByUserID,
             'InsertedMacName' => 'flutterApp',
