@@ -33,7 +33,6 @@ class Patient extends Authenticatable
         'InsertedMacName',
         'InsertedMacID',
         'InsertedIPAddress',
-        'Deactive',
     ];
     protected $hidden = [
         'patient_password',
