@@ -28,6 +28,13 @@ class SettingController extends Controller
         ->select('PatientSubType_ID', 'PatientSubType_Code', 'PatientSubType_Desc')
         ->where('Deactive', '0')->get();
 
+        $Religion_Mst = DB::table('Religion_Mst')
+        ->select('Religion_ID', 'Religion_Code', 'Religion_Name')
+        ->where('Deactive', '0')->get();
+
+        $BBBloodGroupMst = DB::table('BBBloodGroupMst')
+        ->select('GroupID', 'GroupName')
+        ->whereNotNull('GroupName')->get();
 
         $data =[
             'gender' => $gender,
@@ -35,6 +42,8 @@ class SettingController extends Controller
             'nationality' => $nationality,
             'patientType' => $patientType,
             'patientSubType_Mst' => $patientSubType_Mst,
+            'Religion_Mst' => $Religion_Mst,
+            'BBBloodGroupMst' => $BBBloodGroupMst,
         ];
         return $data;
     }
