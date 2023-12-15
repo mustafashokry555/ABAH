@@ -13,6 +13,13 @@ return new class extends Migration
     public function up(): void
     {
         DB::unprepared("
+            IF OBJECT_ID('usp_app_apiGetAllDoctors', 'P') IS NOT NULL
+            BEGIN
+                DROP PROCEDURE usp_app_apiGetAllDoctors;
+            END
+        ");
+
+        DB::unprepared("
             create proc [dbo].[usp_app_apiGetAllDoctors]   
             AS  
             DECLARE @Count AS INT  

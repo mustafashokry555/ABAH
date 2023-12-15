@@ -12,6 +12,14 @@ return new class extends Migration
      */
     public function up()
     {
+
+        DB::unprepared("
+            IF OBJECT_ID('usp_app_apiGetDocAppSlots', 'P') IS NOT NULL
+            BEGIN
+                DROP PROCEDURE usp_app_apiGetDocAppSlots;
+            END
+        ");
+
         DB::unprepared("
             CREATE PROCEDURE usp_app_apiGetDocAppSlots
 

@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('app_rate_doctors');
+
         Schema::create('app_rate_doctors', function (Blueprint $table) {
             $table->id();
             $table->integer('doctor_id')->unsigned();
@@ -29,6 +31,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
     }
 };

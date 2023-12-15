@@ -52,13 +52,13 @@ class PatientController extends Controller
 
     function prescriptions(Request $request) {
         try {
-            $data = DB::select('usp_apiGetAllPrescriptions ?, ?', [
+            $data = DB::select('usp_app_apiGetAllPrescriptions ?, ?', [
                 $request->user()->PatientId,
                 $request->user()->Hospital_ID,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
-            // return $th;
+            return $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
     }

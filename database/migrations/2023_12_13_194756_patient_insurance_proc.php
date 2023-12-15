@@ -13,7 +13,13 @@ return new class extends Migration
     public function up()
     {
         DB::unprepared("
-            ---- usp_app_apiPatientInsuranceDetails
+            IF OBJECT_ID('usp_app_apiPatientInsuranceDetails', 'P') IS NOT NULL
+            BEGIN
+                DROP PROCEDURE usp_app_apiPatientInsuranceDetails;
+            END
+        ");
+
+        DB::unprepared("
             create proc usp_app_apiPatientInsuranceDetails
             (@PatientId int)
             As
@@ -49,6 +55,5 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP PROCEDURE IF EXISTS usp_app_apiPatientInsuranceDetails');
     }
 };
