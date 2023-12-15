@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -11,7 +12,7 @@ class DoctorController extends Controller
 {
     function index(Request $request) {
         try {
-            $data = DB::select('usp_apiGetAllDoctors');
+            $data = DB::select('usp_app_apiGetAllDoctors');
             if(isset($request->search) && isset($request->dep_id)){
                 $dep_id = $request->dep_id;
                 $search = strtolower(trim($request->search));
@@ -65,5 +66,51 @@ class DoctorController extends Controller
             // throw $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
+    }
+
+    function addRate(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
+            'rate' => 'required|numeric|between:0,5',
+            'comment' => 'string|nullable',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        $dateTime = Carbon::now();
+        try{
+            $PatientId = $request->user()->PatientId;
+            $rate = DB::table("app_rate_doctors")
+            ->where([
+                'patient_id' => $PatientId,
+                'doctor_id' => $request->doctor_id
+            ])->first();
+            if(empty($rate)){
+                // inset new rate
+                $rate = DB::table("app_rate_doctors")->insert([
+                    "patient_id" => $PatientId,
+                    "doctor_id" => $request->doctor_id,
+                    "rate" => $request->rate,
+                    "comment" => $request->comment??"",
+                    "created_at" => $dateTime,
+                    "updated_at" => $dateTime
+                    ]);
+                return response()->json(['message' => "Your Rating has been submitted successfully." ,'status' => 200]);
+            }else{
+                // update the rate
+                $rate = DB::table("app_rate_doctors")
+                ->where("id", $rate->id)
+                ->update([
+                    "rate" => $request->rate,
+                    "comment" => $request->comment??"",
+                    "updated_at" => $dateTime
+                ]);
+                return response()->json(['message' => "Your Rating has been Updated successfully." ,'status' => 200]);
+            }
+        } catch (\Throwable $th) {
+            return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+
     }
 }

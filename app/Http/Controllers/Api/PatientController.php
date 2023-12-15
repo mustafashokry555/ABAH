@@ -102,4 +102,25 @@ class PatientController extends Controller
 
         }
     }
+
+    function myRate(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        try{
+            $PatientId = $request->user()->PatientId;
+            $rate = DB::table("app_rate_doctors")
+            ->where([
+                'patient_id' => $PatientId,
+                'doctor_id' => $request->doctor_id
+            ])->first();
+            return response()->json(['data' => $rate ,'status' => 200]);
+        } catch (\Throwable $th) {
+            return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+    }
 }

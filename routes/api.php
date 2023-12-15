@@ -57,9 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/prescriptions', [PatientController::class,'prescriptions']);
         Route::get('/bills', [PatientController::class,'bills']);
         Route::get('/visit_history', [PatientController::class,'visit_history']);
+        Route::get('/myRate', [PatientController::class,'myRate']);
+
     });
     // doctors Routs
-    Route::group(['prefix' => 'doctor'], function () {
+    Route::group(['prefix' => 'doctors'], function () {
         Route::get('/avilSlots', [DoctorController::class,'avilSlots']);
+        Route::get('/rate', [DoctorController::class,'addRate']);
     });
 });

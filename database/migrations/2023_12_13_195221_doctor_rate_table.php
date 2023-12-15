@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('rate');
             $table->text('comment')->nullable();
             $table->timestamps();
-            $table->foreign('doctor_id')->references('UserID')->on('User_Mst')->onDelete('cascade');
+            $table->foreign('doctor_id')->references('EmpID')->on('Employee_Mst')->onDelete('cascade');
             $table->foreign('patient_id')->references('PatientId')->on('Patient')->onDelete('cascade');
 
         });
