@@ -92,10 +92,10 @@ class PatientController extends Controller
     function visit_history(Request $request) {
 
         try {
-            $data = DB::select('usp_api_GetAllVisitList ?, ?, ?', [
+            $data = DB::select('usp_app_api_GetAllVisitList ?, ?', [
                 $request->user()->PatientId,
                 $request->user()->Hospital_ID,
-                NULL,
+                // NULL,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
