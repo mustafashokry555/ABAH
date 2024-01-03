@@ -42,7 +42,7 @@ class PatientController extends Controller
 
     function labResults(Request $request) {
         try {
-            $data = DB::select('usp_apigetLabPatwiseResults ?', [
+            $data = DB::select('usp_app_apigetLabPatwiseResults ?', [
                 $request->user()->PatientId,
             ]);
             return response()->json(['data' => $data, 'status' => 200]);
