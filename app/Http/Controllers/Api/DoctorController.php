@@ -46,6 +46,23 @@ class DoctorController extends Controller
         }
     }
 
+    function getDoctor($doctor_id) {
+        $validator = Validator::make(['doctor_id' => $doctor_id], [
+            'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        $data = DB::table('Employee_Mst')
+        ->where('EmpID', '=', $doctor_id)
+        ->select('Employee_Mst.*', DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT)
+        from app_rate_doctors 
+        where doctor_id = $doctor_id group by doctor_id) as rate"))
+        ->first();
+        return response()->json(['data' => $data ,'status' => 200]);
+
+    }
+
     function avilSlots(Request $request) {
         $validator = Validator::make($request->all(), [
             'doctor_id' => 'required',

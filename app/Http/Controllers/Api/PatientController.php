@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -119,7 +121,149 @@ class PatientController extends Controller
             ])->first();
             return response()->json(['data' => $rate ,'status' => 200]);
         } catch (\Throwable $th) {
-            return $th;
+            // return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+    }
+
+    function makeAppointment(Request $request) {
+        //validate important inputs
+        $validator = Validator::make($request->all(), [
+            'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
+            'DATE' => 'required|date',
+            'SlotsTime' => [
+                'required',
+                'regex:/^(0[1-9]|1[0-2]):[0-5][0-9] (AM|PM) To (0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/'
+            ],
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        // get from & to dateTime
+        list($fromTime, $toTime) = explode(" To ", $request->SlotsTime);
+        $date = new DateTime($request->DATE);
+        $from = $date->format('Y-m-d') . ' ' . date('H:i:s', strtotime($fromTime));
+        $to = $date->format('Y-m-d') . ' ' . date('H:i:s', strtotime($toTime));
+        $AppointmentCount = DB::table('Ds_PatientAppoinmentTemperary')
+        ->where([
+            'FromTime' => $from,
+            'ToTime' => $to,
+            'DoctorID' => $request->doctor_id,
+            'ApntStatus' => 'CONFIRMED'
+        ])
+        // ->whereNull('Cancelled')
+        ->count();
+        if($AppointmentCount > 0){
+            return response()->json(['message'=>"This time slot is already booked.", 'status' => 406]);
+        }
+        // return $AppointmentCount;
+
+        // generate new AppointmentCode
+        $lastAppointmentCode = DB::table('Ds_PatientAppoinmentTemperary')
+        ->orderBy('ID', 'DESC')->get(['ID', 'AppointmentCode'])->first();
+        $newCode = substr(strrchr($lastAppointmentCode->AppointmentCode, "/"), 1) + 1;
+        $newAppointmentCode = 'WA/' . $date->format('Ym') . '/' . $newCode;
+
+        $row = [
+            "ID" => $lastAppointmentCode->ID + 1,
+            "FromTime" => $from,
+            "ToTime" => $to,
+            "AppointmentCode" => $newAppointmentCode,
+            'DoctorID' => $request->doctor_id,
+            'Duration' => 0,
+            'Loc_Id' => 1,
+            'app_date' => $date->format('Y-m-d')." 00:00:00.000",
+        ];
+
+        $user = Auth::guard('api')->user();
+        if ($user) {
+            // case the patient is Auth Ds_PatientAppoinmentTemperary
+            // merge user data in row array 
+            $row = array_merge($row, [
+                "PatientID" => $user->PatientId,
+                "Firstname"=> $user->First_Name,
+                "Middlename" => $user->Middle_Name,
+                "LastName" => $user->Last_Name,
+                "Age" => $user->Age,
+                "Gender" => $user->Gender,
+                "StreetAddress" => $user->Contract_Address,
+                "City" => $user->Contact_City,
+                "State" => $user->Contact_State,
+                "Mobile" => $user->Mobile,
+                'Country' => $user->ContactCountry,
+            ]);
+        } else {
+            //validate important inputs
+            $validator = Validator::make($request->all(), [
+                'Firstname' => 'required|string',
+                'Middlename' => 'string|nullable',
+                'LastName' => 'string|nullable',
+                'Age' => 'required|integer',
+                // 'Gender' => 'required|date',
+                // 'StreetAddress' => 'required|date',
+                // 'City' => 'required|date',
+                // 'State' => 'required|date',
+                'Mobile' => 'required|numeric|digits:9',
+                // 'Country' => 'required|date',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            }
+            // case the patient is Gest
+            $row = array_merge($row, [
+                "PatientID" => 0,
+                "Firstname"=> $request->First_Name,
+                "Middlename" => $request->Middle_Name,
+                "LastName" => $request->Last_Name,
+                "Age" => $request->Age,
+                "Gender" => $request->Gender,
+                "StreetAddress" => $request->Contract_Address,
+                "City" => $request->Contact_City,
+                "State" => $request->Contact_State,
+                "Mobile" => $request->Mobile,
+                'Country' => $request->ContactCountry,
+            ]);
+        }
+        try {
+            $newAppointment = DB::table('Ds_PatientAppoinmentTemperary')
+            ->insert($row);
+            return response()->json(['message'=>'Your Appointment has been Updated Successfully!', 'status' => 200]);
+        } catch (\Throwable $th) {
+            throw $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+    }
+
+    function cancelAppointment(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'TempId' => 'required|integer',
+            'PatientId' => 'required|integer',
+            'AppCode' => 'required',
+            'APPDate' => 'required|date_format:Y-m-d',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        try {
+            $data = DB::statement('EXEC usp_api_DeleteAppointment ?, ?, ?, ?, ?', [
+                // 96060,
+                $request->TempId,
+                // 24894,
+                $request->PatientId,
+                // 'WA/202308/94269',
+                $request->AppCode,
+                // '2023-08-13',
+                $request->APPDate,
+                1
+            ]);
+            if($data)
+            {
+                return response()->json(['message'=>'Your Appointment has been Deleted Successfully!', 'status' => 200]);
+            }else{
+            return response()->json(['errors' => $data, 'status' => 500]);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
     }

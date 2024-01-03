@@ -28,6 +28,7 @@ Response Status
 */
 
 // Auth Routs
+// Route::get('/PDF', [DepartmentController::class, 'PD']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -38,7 +39,15 @@ Route::group(['prefix' => 'departments'], function () {
 
 // doctors Routs
 Route::group(['prefix' => 'doctors'], function () {
+    Route::get('/doctor/{doctor_id}', [DoctorController::class,'getDoctor']);
     Route::get('/all', [DoctorController::class,'index']);
+    Route::post('/avilSlots', [DoctorController::class,'avilSlots']);
+});
+
+// patients Routs
+Route::group(['prefix' => 'patient'], function () {
+    Route::post('/makeAppointment', [PatientController::class,'makeAppointment']);
+    Route::post('/cancelAppointment', [PatientController::class,'cancelAppointment']);
 });
 
 //Basic Data
@@ -62,7 +71,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     // doctors Routs
     Route::group(['prefix' => 'doctors'], function () {
-        Route::get('/avilSlots', [DoctorController::class,'avilSlots']);
         Route::get('/rate', [DoctorController::class,'addRate']);
     });
 });
