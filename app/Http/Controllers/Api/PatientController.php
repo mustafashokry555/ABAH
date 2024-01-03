@@ -52,6 +52,20 @@ class PatientController extends Controller
         }
     }
 
+    function appointment(Request $request) {
+        try {
+            $PatientId = $request->user()->PatientId;
+            $appointments = DB::table("Ds_PatientAppoinmentTemperary")
+            ->where([
+                'PatientID' => $PatientId,
+            ])->get();
+            return response()->json(['data' => $appointments ,'status' => 200]);
+        } catch (\Throwable $th) {
+            // return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+    }
+
     function prescriptions(Request $request) {
         try {
             $data = DB::select('usp_app_apiGetAllPrescriptions ?, ?', [
