@@ -60,9 +60,17 @@ class PatientController extends Controller
         try {
             $PatientId = $request->user()->PatientId;
             $appointments = DB::table("Ds_PatientAppoinmentTemperary")
-                ->where([
-                    'PatientID' => $PatientId,
-                ])->get();
+            ->join('Employee_Mst', 'Ds_PatientAppoinmentTemperary.DoctorID', '=', 'Employee_Mst.EmpID')
+            ->join('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
+            ->where('Ds_PatientAppoinmentTemperary.PatientID', $PatientId,)
+            ->select(
+                'Ds_PatientAppoinmentTemperary.*',
+                DB::raw("'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName AS DoctorName"),
+                DB::raw("N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName AS DoctorNameAr"),
+                DB::raw("Department_Mst.Department_Name AS DoctorSpeciality"),
+                DB::raw("Department_Mst.Department_Name_Arabic AS DoctorSpecialityAr"),
+                )
+            ->get();
             return response()->json(['data' => $appointments, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
@@ -242,6 +250,7 @@ class PatientController extends Controller
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
     }
+
     function makeAppointment(Request $request)
     {
         //validate important inputs
