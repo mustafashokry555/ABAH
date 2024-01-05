@@ -91,4 +91,33 @@ class AuthController extends Controller
 
         // return response()->json(['error' => 'Invalid credentials'], 401);
     }
+
+    function changePass(Request $request){
+        $validator = Validator::make($request->all(), [
+            'oldPassword' => 'required',
+            'newPassword' => 'required|min:6|confirmed',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        // check if the old pass = the auth pass
+        $Patient = $request->user();
+        if($Patient->patient_password == base64_encode($request->oldPassword)){
+            $Patient->patient_password = base64_encode($request->newPassword);
+            $Patient->save();
+            return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+        }else{
+            return response()->json(['errors' => "The Old password is not correct!", 'status' => 422]);
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+
+        // Revoke all tokens for the authenticated user
+        $user->tokens()->delete();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 }
