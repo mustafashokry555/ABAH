@@ -40,4 +40,9 @@ class Patient extends Authenticatable
     protected $hidden = [
         'patient_password',
     ];
+
+    public function otp()
+    {
+        return $this->hasOne(Otp::class, 'PatientId');
+    }
 }

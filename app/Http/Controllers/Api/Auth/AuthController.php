@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Otp;
 use App\Models\Patient;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,57 +17,124 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'NationalNo' => 'required|unique:Patient|numeric|digits:10',
-            'First_Name' => 'required',
-            'Middle_Name' => 'required',
-            'Last_Name' => 'required',
-            'Mobile' => 'required|unique:Patient|numeric|digits:9',
-            'Date_Of_Birth' => 'required|date_format:Y-m-d|before:tomorrow',
-            'Gender' => 'required|integer|exists:Gender_Mst,Gender_ID,Active,1',
-            'MaritalStatus' => 'required|integer|exists:MaritalStatus_Mst,Status_ID,Deactive,0',
-            'Nationality' => 'required|integer|exists:Nationality_Master,NationalityId,Deactive,0', 
-            'patient_password' => 'required|min:6|confirmed',
-            'PatientType_ID' => 'required|integer|exists:PatientType_mst,PatientType_ID,Deactive,0', 
-            'PatientSubType_ID' => 'required|integer|exists:PatientSubType_Mst,PatientSubType_ID,Deactive,0', 
+            // 'NationalNo' => 'required',
+            'Registration_No' => 'required',
+            'Mobile' => 'required', 
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
-        $Registration_No = Patient::orderBy('Registration_No', 'DESC')->pluck('Registration_No')->toArray();
-        $Registration_No =  max($Registration_No)+1;
-        $InsertedByUserID = DB::table('User_Mst')->where('UserName', 'mobileApp')->pluck('UserID')->first();
-        // return $Registration_No ;
-        //Patient Creation
-        $patient = Patient::create([
-            'NationalNo' => $request->NationalNo,
-            'First_Name' => $request->First_Name,
-            'Middle_Name' => $request->Middle_Name,
-            'Last_Name' => $request->Last_Name,
-            'Mobile' => $request->Mobile,
-            'Gender'=> $request->Gender,
-            'MaritalStatus' => $request->MaritalStatus,
-            'Nationality'=> $request->Nationality,
-            'patient_password' => base64_encode($request->patient_password),
-            'Registration_No' => $Registration_No,
-            'PatientType_ID' => $request->PatientType_ID,
-            'PatientSubType_ID' => $request->PatientSubType_ID,
-            'Date_Of_Birth' => $request->Date_Of_Birth,
-            //defultValue
-            'InsertedByUserID' => $InsertedByUserID,
-            'InsertedMacName' => 'flutterApp',
-            'InsertedMacID' => '10',
-            'InsertedIPAddress' => '192.168.1.1',
-            'Hospital_ID' => '1',
-            'Deactive' => '0',
-        ]);
-        if($patient->save()){
-            $expirationTime = now()->addDays(7);
-            $patient = Patient::where('Registration_No', $Registration_No)->first();
-            $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
-            return response()->json(['token' => $token, 'patient' => $patient, 'status' => 200]);    
+        $patient = Patient::where('Registration_No', $request->Registration_No)->first();
+        if($patient){
+            if ($patient->Mobile == $request->Mobile) {
+                if ($patient->Deactive == '0') {
+                    if ($patient->patient_password == 'sdc1' || $patient->patient_password == NULL) {
+                        // create new pass and sent it to the mobile 
+                        $newPassword = $patient->PassportNo;
+                        $patient->patient_password = base64_encode($newPassword);
+                        $patient->save();
+                        
+                        return $this->generateOtp($patient, "First Register");
+                        
+                    }else{
+                        return response()->json([
+                            'errors' => "This Account is already registered.",
+                            'status' => 422
+                        ]);
+                    }
+                }else{
+                    return response()->json([
+                        'errors' => "This Account is Deactive, Please contact the hospital to activate your account.",
+                        'status' => 422
+                    ]);
+                }
+            }else{
+                return response()->json([
+                    'errors' => "This Mobile Number not valid for this medical file.",
+                    'status' => 422
+                ]);
+            }
         }else{
-            return response()->json(['errors' => 'DB Error', 'status' => 500]);    
+            return response()->json([
+                'errors' => "This Medical file Not exist in our recoreds.",
+                'status' => 422
+            ]);
         }
+    }
+
+
+    public function generateOtp(Patient $patient, $reason)
+    {
+        $otp = rand(100000, 999999);
+        // if Patient count >= 4 don't create new one 
+        if ($patient->OTP_Request_Count >=4 ){
+            $lastOtp = Otp::where('patient_id', $patient->PatientId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($lastOtp && now()->diffInHours($lastOtp->created_at) > 24) {
+                $patient->OTP_Request_Count =  1 ;
+            }else{
+                response()->json([
+                    'errors' => "You have reached maximum OTP request limit. Try again after 24H!",
+                    'status' => 422
+                ]);
+            }
+            
+        }
+        else{
+            $patient->OTP_Request_Count = $patient->OTP_Request_Count + 1 ;
+        }
+        
+        // Send SMS with the generated otp to patient mobile number
+        $res = $this->sendSms($patient->MobileNumber ,$otp );
+        if($res){
+            $patient->OTP = $otp;
+            $patient->save();
+                Otp::create([
+                    'patient_id' => $patient->PatientId,
+                    'reason' => $reason,
+                    'otp' => $otp,
+                ]);
+            $firstDigits = substr($patient->Mobile, 0, 1);
+            $lastDigits = substr($patient->Mobile, -3);
+            return response()->json([
+                "message" => "We Send you a password on your phone: +966$firstDigits"."xxxxx$lastDigits .",
+                "status" => 200
+            ]);   
+        }else{
+            response()->json([
+                'errors' => "Send SMS Error!",
+                'status' => 422
+            ]);
+        }
+
+        return response()->json(['message' => 'OTP generated successfully']);
+    }
+
+    function sendSms($phone, $otp){
+        // send the sms massage throw api
+        $text = "Your One Time Password (OTP) is : $otp \n\r".
+        "This code will expire in 5 minutes.\n\r".
+        "Do Not shere it with Others.\n
+        \r\n".
+        "Regards,\n".
+        "ABAH";
+        $url = "http://46.151.210.31:8080/websmpp/websms";
+        $params = [
+            'user' => 'Alibinali',
+            'pass' => 'Waleed@23',
+            'mno' => $phone,
+            'type' => 4,
+            'text' => $text,
+            'sid' => 'ABAH',
+            'respformat' => 'json',
+        ];
+        $client = new Client();
+        $response = $client->request('GET', $url, ['query' => $params]);
+        $responseCode = $response->getStatusCode();
+        $responseBody = $response->getBody()->getContents();
+        
     }
 
     public function login(Request $request)
