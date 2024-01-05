@@ -35,7 +35,9 @@ return new class extends Migration
             detail.Tmfrm as FromTime ,detail.tmto as ToTime,detail.Slot,                                                                            
             CONVERT(date, @DTFROM,103)as [DATE]                                                                        
             , ISNULL(DD.IsBlock,0) as [Block],ISNULL(DD.DtBlockId,0) as DtBlockId ,                                                            
-            CASE WHEN ISNULL(DD.IsBlock,0) = 1 THEN 'Blocked Slot' ELSE   ' ' END as sub ,                                                
+            CASE WHEN ISNULL(DD.IsBlock,0) = 1 THEN 'Blocked Slot' ELSE   ' ' END as sub ,
+            CONCAT(APP.Firstname, ' ', APP.Middlename, ' ', APP.LastName)  AS patientName, APP.Age AS Age,
+			APP.Mobile AS Mobile, APP.AppointmentCode AS AppointmentCode,                                               
             App.Id  As Registration_No , 0 as  PatientId, 0 as VisitId  , @DTFROM as FromDateTime                                                           
             into #Temp1                                                        
             from doctiming_dtl detail                                 
@@ -75,7 +77,9 @@ return new class extends Migration
             ' Patient: '+ isnull(APP.Firstname,'') + ' ' + isnull(APP.Middlename,'') + ' ' + isnull(APP.LastName,'') +  ' '  +  isnull(APP.ThirdName,'') +   ' ' +                                                           
             isnull(P.R_FirstName,'') + ' ' + isnull(P.R_MiddleName,'') + ' ' + isnull(P.R_ThirdName,'') + ' ' + isnull(P.R_FamilyName,'') + ' Status:' + isnull(APP.ApntStatus,'Not Confirmed') + ' Mob.:' + isnull(P.Mobile,0)
             END,T1.sub),'''','')                                                 
-            as sub,                                                            
+            as sub, 
+            CONCAT(APP.Firstname, ' ', APP.Middlename, ' ', APP.LastName)  AS patientName, APP.Age AS Age,
+			APP.Mobile AS Mobile, APP.AppointmentCode AS AppointmentCode,                                                           
             CASE WHEN isnull(APP.PatientId,0) = 0 AND isnull(T1.REGISTRATION_NO,0) != 0                                                         
             THEN 'UNREGISTERED' ELSE CONVERT(varchar(20), P.REGISTRATION_NO) END As Registration_No                                                            
             , isnull(APP.PatientId,0) as  PatientId,                    

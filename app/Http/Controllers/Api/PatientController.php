@@ -228,10 +228,10 @@ class PatientController extends Controller
             }
             // case the patient is Gest
             $row = array_merge($row, [
-                "PatientID" => 0,
-                "Firstname" => $request->First_Name,
-                "Middlename" => $request->Middle_Name,
-                "LastName" => $request->Last_Name,
+                "PatientID" => -1,
+                "Firstname" => $request->Firstname,
+                "Middlename" => $request->Middlename,
+                "LastName" => $request->LastName,
                 "Age" => $request->Age,
                 "Gender" => $request->Gender,
                 "StreetAddress" => $request->Contract_Address,
@@ -243,7 +243,7 @@ class PatientController extends Controller
         }
         try {
             $newAppointment = DB::table('Ds_PatientAppoinmentTemperary')
-                ->insert($row);
+                ->insert([$row]);
             return response()->json(['message' => 'Your Appointment has been Updated Successfully!', 'status' => 200]);
         } catch (\Throwable $th) {
             throw $th;
