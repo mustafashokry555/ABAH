@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Otp;
 use App\Models\Patient;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -137,6 +138,68 @@ class AuthController extends Controller
         $responseCode = $response->getStatusCode();
         $responseBody = $response->getBody()->getContents();
         
+    }
+
+    function setNewPass(Request $request){
+        $validator = Validator::make($request->all(), [
+            'Registration_No' => 'required',
+            'otp' => 'required|numeric|digits:6',
+            'password' => 'required|min:6|confirmed',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        // check if the old pass = the auth pass
+        $patient = Patient::where('Registration_No', $request->Registration_No)->first();
+        $expiryTime = Carbon::now()->subMinutes(5);
+        $lastOtp = Otp::where('patient_id', $patient->PatientId)
+            ->where('created_at', '>', $expiryTime)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        if($patient){
+            if($lastOtp){
+                if ($patient->OTP == $request->otp && $request->otp == $lastOtp->otp) {
+                    $patient->patient_password = base64_encode($request->password);
+                    $patient->OTP_Request_Count = 0;
+                    $patient->OTP = NULL;
+                    $patient->save();
+                    return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+                }else{
+                    return response()->json([
+                        'errors' => "This OTP Number not valid.",
+                        'status' => 422
+                    ]);
+                }
+            }else{
+                return response()->json([
+                    'errors' => "This OTP Number is Expired.",
+                    'status' => 422
+                ]);
+            }
+        }else{
+            return response()->json([
+                'errors' => "This Medical file Not exist in our recoreds.",
+                'status' => 422
+            ]);
+        }
+    }
+
+    function forgetPass(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'Registration_No' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        $patient = Patient::where('Registration_No', $request->Registration_No)->first();
+        if($patient){
+            return $this->generateOtp($patient, "Forget Password");
+        }else{
+            return response()->json([
+                'errors' => "This Medical file Not exist in our recoreds.",
+                'status' => 422
+            ]);
+        }
     }
 
     public function login(Request $request)

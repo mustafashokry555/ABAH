@@ -31,6 +31,8 @@ Response Status
 // Route::get('/PDF', [DepartmentController::class, 'PD']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/setNewPass', [AuthController::class, 'setNewPass']);
+Route::post('/forgetPass', [AuthController::class, 'forgetPass']);
 
 // departments Routs
 Route::group(['prefix' => 'departments'], function () {
