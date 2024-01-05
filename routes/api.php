@@ -70,6 +70,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [PatientController::class,'appointment']);
 
     });
+
+    // Auth
+    Route::post('/changePass', [AuthController::class,'changePass']);
+    Route::post('/logout', [AuthController::class,'logout']);
+    
+
     // doctors Routs
     Route::group(['prefix' => 'doctors'], function () {
         Route::get('/rate', [DoctorController::class,'addRate']);
