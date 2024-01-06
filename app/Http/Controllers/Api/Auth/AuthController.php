@@ -89,8 +89,8 @@ class AuthController extends Controller
         }
         
         // Send SMS with the generated otp to patient mobile number
-        $res1 = $this->sendSms($patient->MobileNumber ,$otp );
-        $res = true;
+        $res = $this->sendSms($patient->MobileNumber ,$otp );
+        // $res = true;
         if($res){
             $patient->OTP = $otp;
             $patient->save();
@@ -99,7 +99,7 @@ class AuthController extends Controller
                     'reason' => $reason,
                     'otp' => $otp,
                 ]);
-                return $res1;
+                // return $res1;
             $firstDigits = substr($patient->Mobile, 0, 1);
             $lastDigits = substr($patient->Mobile, -3);
             return response()->json([
@@ -137,14 +137,9 @@ class AuthController extends Controller
         $client = new Client();
         $response = $client->request('GET', $url, ['query' => $params]);
         $responseCode = $response->getStatusCode();
-        $responseBody = $response->getBody()->getContents();
-        $responseBody = json_encode($response->getBody()->getContents());
-        return response()->json([
-            'errors' => $responseCode,
-            'status' => $responseBody
-        ]);
-        
-        
+        $responseBody = json_encode($response->getBody());
+        if ($responseCode == 200 && isset($responseBody['Response']) && is_numeric($responseBody['Response']))
+        {return true;} else {return false;}
     }
 
     function setNewPass(Request $request){
