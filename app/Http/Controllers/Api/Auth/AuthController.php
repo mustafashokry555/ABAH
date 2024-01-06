@@ -31,9 +31,9 @@ class AuthController extends Controller
                 if ($patient->Deactive == '0') {
                     if ($patient->patient_password == 'sdc1' || $patient->patient_password == NULL) {
                         // create new pass and sent it to the mobile 
-                        $newPassword = $patient->PassportNo;
-                        $patient->patient_password = base64_encode($newPassword);
-                        $patient->save();
+                        // $newPassword = $patient->PassportNo;
+                        // $patient->patient_password = base64_encode($newPassword);
+                        // $patient->save();
                         
                         return $this->generateOtp($patient, "First Register");
                         
@@ -66,8 +66,8 @@ class AuthController extends Controller
 
     public function generateOtp(Patient $patient, $reason)
     {
-        $otp = 999999;
-        // $otp = rand(100000, 999999);
+        // $otp = 999999;
+        $otp = rand(100000, 999999);
         // if Patient count >= 4 don't create new one 
         if ($patient->OTP_Request_Count >=4 ){
             $lastOtp = Otp::where('patient_id', $patient->PatientId)
@@ -89,7 +89,7 @@ class AuthController extends Controller
         }
         
         // Send SMS with the generated otp to patient mobile number
-        // $res = $this->sendSms($patient->MobileNumber ,$otp );
+        $res1 = $this->sendSms($patient->MobileNumber ,$otp );
         $res = true;
         if($res){
             $patient->OTP = $otp;
@@ -99,6 +99,7 @@ class AuthController extends Controller
                     'reason' => $reason,
                     'otp' => $otp,
                 ]);
+                return $res1;
             $firstDigits = substr($patient->Mobile, 0, 1);
             $lastDigits = substr($patient->Mobile, -3);
             return response()->json([
@@ -127,16 +128,22 @@ class AuthController extends Controller
         $params = [
             'user' => 'Alibinali',
             'pass' => 'Waleed@23',
-            'mno' => $phone,
-            'type' => 4,
-            'text' => $text,
             'sid' => 'ABAH',
+            'mno' => "966$phone",
+            'type' => 1,
+            'text' => $text,
             'respformat' => 'json',
         ];
         $client = new Client();
         $response = $client->request('GET', $url, ['query' => $params]);
         $responseCode = $response->getStatusCode();
         $responseBody = $response->getBody()->getContents();
+        $responseBody = json_encode($response->getBody()->getContents());
+        return response()->json([
+            'errors' => $responseCode,
+            'status' => $responseBody
+        ]);
+        
         
     }
 
