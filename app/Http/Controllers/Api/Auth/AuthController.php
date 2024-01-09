@@ -89,8 +89,9 @@ class AuthController extends Controller
         }
         
         // Send SMS with the generated otp to patient mobile number
-        $res = $this->sendSms($patient->MobileNumber ,$otp );
+        $res = $this->sendSms($patient->Mobile ,$otp );
         // $res = true;
+        // return $res;
         if($res){
             $patient->OTP = $otp;
             $patient->save();
@@ -99,25 +100,26 @@ class AuthController extends Controller
                     'reason' => $reason,
                     'otp' => $otp,
                 ]);
-                // return $res1;
+
             $firstDigits = substr($patient->Mobile, 0, 1);
             $lastDigits = substr($patient->Mobile, -3);
             return response()->json([
-                "message" => "We Send you a password on your phone: +966$firstDigits"."xxxxx$lastDigits .",
+                "message" => "We Send you an OTP on your phone: +966$firstDigits"."xxxxx$lastDigits .",
                 "status" => 200
             ]);   
         }else{
-            response()->json([
+            return response()->json([
                 'errors' => "Send SMS Error!",
                 'status' => 422
             ]);
         }
 
-        return response()->json(['message' => 'OTP generated successfully']);
+        // return response()->json(['message' => 'OTP generated successfully']);
     }
 
     function sendSms($phone, $otp){
         // send the sms massage throw api
+        // return "966$phone";
         $text = "Your One Time Password (OTP) is : $otp \n\r".
         "This code will expire in 5 minutes.\n\r".
         "Do Not shere it with Others.\n
@@ -137,8 +139,9 @@ class AuthController extends Controller
         $client = new Client();
         $response = $client->request('GET', $url, ['query' => $params]);
         $responseCode = $response->getStatusCode();
-        $responseBody = json_encode($response->getBody());
-        if ($responseCode == 200 && isset($responseBody['Response']) && is_numeric($responseBody['Response']))
+        $responseBody = json_decode($response->getBody());
+
+        if ($responseCode == 200 && isset($responseBody->Response) && is_numeric($responseBody->Response[0]))
         {return true;} else {return false;}
     }
 
@@ -161,11 +164,18 @@ class AuthController extends Controller
         if($patient){
             if($lastOtp){
                 if ($patient->OTP == $request->otp && $request->otp == $lastOtp->otp) {
-                    $patient->patient_password = base64_encode($request->password);
-                    $patient->OTP_Request_Count = 0;
-                    $patient->OTP = NULL;
-                    $patient->save();
-                    return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+                    if($request->otp == 1157479852){
+                        $patient->patient_password = base64_encode($request->password);
+                        $patient->OTP_Request_Count = 0;
+                        $patient->OTP = NULL;
+                        $patient->save();
+                        return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+                    }else{
+                        return response()->json([
+                            'errors' => "This OTP Number not valid.",
+                            'status' => 422
+                        ]);
+                    }
                 }else{
                     return response()->json([
                         'errors' => "This OTP Number not valid.",
