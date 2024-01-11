@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('app_company_setting');
+        Schema::dropIfExists('app_patient_comments');
 
-        Schema::create('app_company_setting', function (Blueprint $table) {
+        Schema::create('app_patient_comments', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->text('value');
+            $table->enum('subject', ['complaint', 'gratitude', 'suggestion', 'technical fault']);
+            $table->string('name');
+            $table->string('mobile');
+            $table->text('comment');
             $table->timestamps();
-
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_company_setting');
+        //
     }
 };

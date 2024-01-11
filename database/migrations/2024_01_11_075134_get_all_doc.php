@@ -27,19 +27,22 @@ return new class extends Migration
             BEGIN  
             SELECT EM.EmpID AS DoctorId, N'Dr. ' + FirstName + ' ' + MiddleName + ' ' + LastName AS DoctorName  
             ,N'د. ' + R_FirstName + ' ' + R_MiddleName + ' ' + R_LastName AS DoctorNameAr  
-                
+            
             ,DM.Department_ID AS DepartmentId  
             ,DM.Department_Name AS DoctorSpeciality  
             ,DM.Department_Name_Arabic AS DoctorSpecialityAr  
+			,DD.profilePic AS DoctorImg 
             ,AVG(RT.rate) AS AverageRate
             FROM Employee_Mst EM  
             INNER JOIN Department_Mst DM ON EM.Department_ID = DM.Department_ID  
             LEFT JOIN
                 app_rate_doctors RT ON EM.EmpID = RT.doctor_id
+			LEFT JOIN
+                app_doctor_details DD ON EM.EmpID = DD.doctor_id
             WHERE (EM.EmpType = N'Doc')  
             AND EM.Deactive = 0   
             GROUP BY
-                EM.EmpID, EM.FirstName, EM.MiddleName, EM.LastName, EM.R_FirstName, EM.R_MiddleName, EM.R_LastName, DM.Department_ID, DM.Department_Name, DM.Department_Name_Arabic
+                DD.profilePic, EM.EmpID, EM.FirstName, EM.MiddleName, EM.LastName, EM.R_FirstName, EM.R_MiddleName, EM.R_LastName, DM.Department_ID, DM.Department_Name, DM.Department_Name_Arabic
             
             ORDER BY EM.FirstName ASC
             END
