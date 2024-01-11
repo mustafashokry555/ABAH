@@ -36,7 +36,7 @@ class SettingController extends Controller
         ->select('GroupID', 'GroupName')
         ->whereNotNull('GroupName')->get();
 
-        $CompanySetting = DB::table('app_company_setting')->all();
+        $CompanySetting = DB::table('app_company_setting')->get();
 
         $data =[
             'gender' => $gender,
