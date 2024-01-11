@@ -66,10 +66,7 @@ class DoctorController extends Controller
             DB::raw('Department_Mst.Department_ID AS DepartmentId'),
             DB::raw('Department_Mst.Department_Name AS speciality'),
             DB::raw('Department_Mst.Department_Name_Arabic AS specialityAr'),
-            'app_doctor_details.profilePic', 'app_doctor_details.nationality',
-            'app_doctor_details.experience', 'app_doctor_details.lang',
-            'app_doctor_details.services', 'app_doctor_details.qualification',
-            'app_doctor_details.membership',
+            'app_doctor_details.*',
             DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
         )
         ->first();
