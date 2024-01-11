@@ -59,8 +59,9 @@ class DoctorController extends Controller
         ->select(
             'Employee_Mst.EmpID', 'Employee_Mst.FirstName',
             'Employee_Mst.MiddleName', 'Employee_Mst.LastName',
-            'Employee_Mst.BirthDate', 'Employee_Mst.Gender',
-            'Employee_Mst.R_FirstName', 'Employee_Mst.R_MiddleName', 'Employee_Mst.R_LastName',
+            DB::raw("FORMAT(Employee_Mst.BirthDate, 'yyyy-MM-dd') as BirthDate"),
+            'Employee_Mst.Gender', 'Employee_Mst.R_FirstName',
+            'Employee_Mst.R_MiddleName', 'Employee_Mst.R_LastName',
             'app_doctor_details.profilePic', 'app_doctor_details.nationality',
             'app_doctor_details.experience', 'app_doctor_details.lang',
             'app_doctor_details.services', 'app_doctor_details.qualification',
