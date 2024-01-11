@@ -57,16 +57,14 @@ class DoctorController extends Controller
         ->leftJoin('app_doctor_details', 'Employee_Mst.EmpID', '=', 'app_doctor_details.doctor_id')
         ->where('EmpID', '=', $doctor_id)
         ->select(
-            'Employee_Mst.*',
-            'app_doctor_details.profilePic',
-            'app_doctor_details.nationality',
-            'app_doctor_details.gender',
-            'app_doctor_details.experience',
-            'app_doctor_details.lang',
-            'app_doctor_details.services',
-            'app_doctor_details.qualification',
-            'app_doctor_details.membership',
-            'app_doctor_details.speciality',
+            'Employee_Mst.EmpID', 'Employee_Mst.FirstName',
+            'Employee_Mst.MiddleName', 'Employee_Mst.LastName',
+            'Employee_Mst.BirthDate', 'Employee_Mst.Gender',
+            'Employee_Mst.R_FirstName', 'Employee_Mst.R_MiddleName', 'Employee_Mst.R_LastName',
+            'app_doctor_details.profilePic', 'app_doctor_details.nationality',
+            'app_doctor_details.experience', 'app_doctor_details.lang',
+            'app_doctor_details.services', 'app_doctor_details.qualification',
+            'app_doctor_details.membership', 'app_doctor_details.speciality',
             DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
         )
         ->first();

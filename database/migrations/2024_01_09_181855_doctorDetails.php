@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('profilePic');
             $table->integer('doctor_id')->unsigned();
             $table->string('nationality');
-            $table->string('gender');
+            // $table->string('gender');
             $table->string('experience');
             $table->string('lang');
             $table->string('services');
