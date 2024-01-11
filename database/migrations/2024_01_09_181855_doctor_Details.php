@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('services');
             $table->string('qualification');
             $table->string('membership');
-            $table->string('speciality');
+            // $table->string('speciality');
             $table->timestamps();
 
             $table->foreign('doctor_id')->references('EmpID')->on('Employee_Mst')->onDelete('cascade');

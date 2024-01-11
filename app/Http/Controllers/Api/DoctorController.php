@@ -55,17 +55,20 @@ class DoctorController extends Controller
         }
         $data = DB::table('Employee_Mst')
         ->leftJoin('app_doctor_details', 'Employee_Mst.EmpID', '=', 'app_doctor_details.doctor_id')
+        ->leftJoin('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
         ->where('EmpID', '=', $doctor_id)
         ->select(
-            'Employee_Mst.EmpID', 'Employee_Mst.FirstName',
-            'Employee_Mst.MiddleName', 'Employee_Mst.LastName',
+            'Employee_Mst.EmpID',
+            DB::raw("N'Dr. ' + FirstName + ' ' + MiddleName + ' ' + LastName AS DoctorName"),
+            DB::raw("N'د. ' + R_FirstName + ' ' + R_MiddleName + ' ' + R_LastName AS DoctorNameAr"),
             DB::raw("FORMAT(Employee_Mst.BirthDate, 'yyyy-MM-dd') as BirthDate"),
-            'Employee_Mst.Gender', 'Employee_Mst.R_FirstName',
-            'Employee_Mst.R_MiddleName', 'Employee_Mst.R_LastName',
+            'Employee_Mst.Gender',
+            DB::raw('Department_Mst.Department_Name AS speciality'),
+            DB::raw('Department_Mst.Department_Name_Arabic AS specialityAr'),
             'app_doctor_details.profilePic', 'app_doctor_details.nationality',
             'app_doctor_details.experience', 'app_doctor_details.lang',
             'app_doctor_details.services', 'app_doctor_details.qualification',
-            'app_doctor_details.membership', 'app_doctor_details.speciality',
+            'app_doctor_details.membership',
             DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
         )
         ->first();
