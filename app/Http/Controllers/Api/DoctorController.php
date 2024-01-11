@@ -63,6 +63,7 @@ class DoctorController extends Controller
             DB::raw("N'د. ' + R_FirstName + ' ' + R_MiddleName + ' ' + R_LastName AS DoctorNameAr"),
             DB::raw("FORMAT(Employee_Mst.BirthDate, 'yyyy-MM-dd') as BirthDate"),
             'Employee_Mst.Gender',
+            DB::raw('Department_Mst.Department_ID AS DepartmentId'),
             DB::raw('Department_Mst.Department_Name AS speciality'),
             DB::raw('Department_Mst.Department_Name_Arabic AS specialityAr'),
             'app_doctor_details.profilePic', 'app_doctor_details.nationality',

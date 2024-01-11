@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class SettingController extends Controller
 {
@@ -52,20 +54,31 @@ class SettingController extends Controller
     }
 
     function makeComplaint(Request $request) {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'subject' => 'required|in:complaint,gratitude,suggestion,technical fault',
             'name' => 'required|string',
-            'mobile' => 'required|string',
+            'mobile' => 'required|numeric|digits:9',
             'comment' => 'required|string',
         ]);
-        // Create a new row in the table
-        $row = DB::table('app_patient_comments')
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        try{
+             // Create a new row in the table
+            $dateTime = Carbon::now();
+            $row = DB::table('app_patient_comments')
             ->insert([
                 "subject" => $request->subject,
                 "name" => $request->name,
                 "mobile" => $request->mobile,
                 "comment" => $request->comment,
+                "created_at" => $dateTime,
+                "updated_at" => $dateTime
             ]);
-        return response()->json(['message' => 'Row added successfully', 'status' => 200]);
+            return response()->json(['message' => 'Row added successfully', 'status' => 200]);
+        } catch (\Throwable $th) {
+            return $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
     }
 }
