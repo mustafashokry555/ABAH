@@ -54,10 +54,21 @@ class DoctorController extends Controller
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
         $data = DB::table('Employee_Mst')
+        ->leftJoin('app_doctor_details', 'Employee_Mst.EmpID', '=', 'app_doctor_details.doctor_id')
         ->where('EmpID', '=', $doctor_id)
-        ->select('Employee_Mst.*', DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT)
-        from app_rate_doctors 
-        where doctor_id = $doctor_id group by doctor_id) as rate"))
+        ->select(
+            'Employee_Mst.*',
+            'app_doctor_details.profilePic',
+            'app_doctor_details.nationality',
+            'app_doctor_details.gender',
+            'app_doctor_details.experience',
+            'app_doctor_details.lang',
+            'app_doctor_details.services',
+            'app_doctor_details.qualification',
+            'app_doctor_details.membership',
+            'app_doctor_details.speciality',
+            DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
+        )
         ->first();
         return response()->json(['data' => $data ,'status' => 200]);
 
