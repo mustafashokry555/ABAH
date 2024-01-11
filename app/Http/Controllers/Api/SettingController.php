@@ -50,4 +50,22 @@ class SettingController extends Controller
         ];
         return $data;
     }
+
+    function makeComplaint(Request $request) {
+        $validatedData = $request->validate([
+            'subject' => 'required|in:complaint,gratitude,suggestion,technical fault',
+            'name' => 'required|string',
+            'mobile' => 'required|string',
+            'comment' => 'required|string',
+        ]);
+        // Create a new row in the table
+        $row = DB::table('app_patient_comments')
+            ->insert([
+                "subject" => $request->subject,
+                "name" => $request->name,
+                "mobile" => $request->mobile,
+                "comment" => $request->comment,
+            ]);
+        return response()->json(['message' => 'Row added successfully', 'status' => 200]);
+    }
 }

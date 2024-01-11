@@ -54,6 +54,7 @@ Route::group(['prefix' => 'patient'], function () {
 
 //Basic Data
 Route::get('/basicData', [SettingController::class,'index']);
+Route::post('/complaints/make', [SettingController::class,'makeComplaint']);
 
 //Garded Routs
 Route::middleware('auth:sanctum')->group(function () {
