@@ -18,9 +18,16 @@ class PatientController extends Controller
             return response()->json(['errors' => 'The patient id field is required.', 'status' => 422]);
         }
         try {
-            $data = DB::select('usp_app_apiPatientInsuranceDetails ?', [
+            $company = DB::select('usp_app_apiPatientInsuranceDetails ?', [
                 $request->user()->PatientId,
             ]);
+            $approval = DB::select('usp_app_apiPatientApprovalDtls ?', [
+                $request->user()->PatientId,
+            ]);
+            $data = [
+                "Company" => $company,
+                "Approval" => $approval
+            ];
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
