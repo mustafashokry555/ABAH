@@ -164,18 +164,18 @@ class AuthController extends Controller
         if($patient){
             if($lastOtp){
                 if ($patient->OTP == $request->otp && $request->otp == $lastOtp->otp) {
-                    if($request->otp == 1157479852){
-                        $patient->patient_password = base64_encode($request->password);
-                        $patient->OTP_Request_Count = 0;
-                        $patient->OTP = NULL;
-                        $patient->save();
-                        return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
-                    }else{
-                        return response()->json([
-                            'errors' => "This OTP Number not valid.",
-                            'status' => 422
-                        ]);
-                    }
+                    $patient->patient_password = base64_encode($request->password);
+                    $patient->OTP_Request_Count = 0;
+                    $patient->OTP = NULL;
+                    $patient->save();
+                    return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+                    // if($request->otp == 1157479852){
+                    // }else{
+                    //     return response()->json([
+                    //         'errors' => "This OTP Number not valid.",
+                    //         'status' => 422
+                    //     ]);
+                    // }
                 }else{
                     return response()->json([
                         'errors' => "This OTP Number not valid.",
