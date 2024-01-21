@@ -7,10 +7,47 @@ use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PatientController extends Controller
 {
+    function editProfile(Request $request) {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'Mobile' => 'required|numeric|digits:9',
+            'img' => 'nullable|image|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        // Find the patient
+        $patient = $request->user();
+
+        // Delete existing image if it exists
+        if ($patient->ImageURL) {
+            Storage::delete("public/patient/profileImg/{$patient->ImageURL}");
+        }
+
+        // Update phhone
+        $patient->Mobile = $request->Mobile;
+
+        // Update image
+        if ($request->hasFile('img')) {
+            $image = $request->file('img');
+            $imageName = "$patient->PatientId-$patient->Registration_No."
+                . $image->getClientOriginalExtension();
+            $image->storeAs('public/patient/profileImg', $imageName);
+            $patient->ImageURL = "public/patient/profileImg/$imageName";
+        }
+
+        // Save changes
+        $patient->save();
+
+        return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
+    }
+
     function insurance(Request $request)
     {
 

@@ -25,6 +25,7 @@ class Patient extends Authenticatable
         'PatientSubType_ID',
         'Date_Of_Birth',
         'Gender',
+        'ImageURL',
         'Nationality',
         'PatientType_ID',
         'patient_password',

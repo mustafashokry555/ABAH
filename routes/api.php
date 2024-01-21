@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,8 +62,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // patients Routs
     Route::group(['prefix' => 'patient'], function () {
         Route::post('/info', function (Request $request) {
-            return response()->json(['data' => $request->user(), 'status' => 200]);
+            $data = $request->user();
+            if (Storage::exists($data->ImageURL)) {
+                $data->ImageURL = url('/').Storage::url($data->ImageURL);
+            }else{
+                $data->ImageURL = NULL;
+            }
+            return response()->json(['data' => $data, 'status' => 200]);
         });
+        Route::post('/editProfile', [PatientController::class,'editProfile']);
         Route::get('/insurance', [PatientController::class,'insurance']);
         Route::get('/radio/reports', [PatientController::class,'radiologyReports']);
         Route::get('/lab/results', [PatientController::class,'labResults']);
