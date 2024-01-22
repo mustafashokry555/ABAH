@@ -76,7 +76,7 @@ class PatientController extends Controller
     function radiologyReports(Request $request)
     {
         try {
-            $data = DB::select('usp_apiGetAllRadioDatewise ?, ?', [
+            $data = DB::select('usp_app_apiGetAllRadioDatewise ?, ?', [
                 $request->user()->PatientId,
                 $request->user()->Hospital_ID,
             ]);
