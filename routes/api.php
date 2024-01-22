@@ -29,7 +29,7 @@ Response Status
 */
 
 // Auth Routs
-// Route::get('/PDF', [DepartmentController::class, 'PD']);
+// Route::post('/PDF', [DepartmentController::class, 'generatePDF']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/setNewPass', [AuthController::class, 'setNewPass']);
@@ -63,8 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'patient'], function () {
         Route::post('/info', function (Request $request) {
             $data = $request->user();
-            if (Storage::exists($data->ImageURL)) {
-                $data->ImageURL = url('/').Storage::url($data->ImageURL);
+            if($data->ImageURL != NULL){
+                if (Storage::exists($data->ImageURL)) {
+                    $data->ImageURL = url('/').Storage::url($data->ImageURL);
+                }
             }else{
                 $data->ImageURL = NULL;
             }
