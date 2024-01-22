@@ -24,27 +24,28 @@ class PatientController extends Controller
         }
         // Find the patient
         $patient = $request->user();
-
-        // Delete existing image if it exists
-        if ($patient->ImageURL) {
-            Storage::delete("public/patient/profileImg/{$patient->ImageURL}");
+        if($request->has('img')){
+            // Delete existing image if it exists
+            if ($patient->ImageURL && Storage::exists($patient->ImageURL)) {
+                Storage::delete("$patient->ImageURL");
+            }
+            if($request->img != null){
+                // Update image
+                if ($request->hasFile('img')) {
+                    $image = $request->file('img');
+                    $imageName = "$patient->PatientId-$patient->Registration_No."
+                        . $image->getClientOriginalExtension();
+                    $image->storeAs('public/patient/profileImg', $imageName);
+                    $patient->ImageURL = "public/patient/profileImg/$imageName";
+                }
+            }else{
+                $patient->ImageURL = NULL;
+            }
         }
-
         // Update phhone
         $patient->Mobile = $request->Mobile;
-
-        // Update image
-        if ($request->hasFile('img')) {
-            $image = $request->file('img');
-            $imageName = "$patient->PatientId-$patient->Registration_No."
-                . $image->getClientOriginalExtension();
-            $image->storeAs('public/patient/profileImg', $imageName);
-            $patient->ImageURL = "public/patient/profileImg/$imageName";
-        }
-
         // Save changes
         $patient->save();
-
         return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
     }
 
