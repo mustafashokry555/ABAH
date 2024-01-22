@@ -17,6 +17,7 @@ class PatientController extends Controller
         $validator = Validator::make($request->all(), [
             'Mobile' => 'required|numeric|digits:9',
             'img' => 'nullable|image|max:2048',
+            'deleteImg' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -24,26 +25,25 @@ class PatientController extends Controller
         }
         // Find the patient
         $patient = $request->user();
-        if($request->has('img')){
-            // Delete existing image if it exists
-            if ($patient->ImageURL && Storage::exists($patient->ImageURL)) {
-                Storage::delete("$patient->ImageURL");
-            }
-            if($request->img != null){
-                // Update image
-                if ($request->hasFile('img')) {
-                    $image = $request->file('img');
-                    $imageName = "$patient->PatientId-$patient->Registration_No."
-                        . $image->getClientOriginalExtension();
-                    $image->storeAs('public/patient/profileImg', $imageName);
-                    $patient->ImageURL = "public/patient/profileImg/$imageName";
-                }
-            }else{
-                $patient->ImageURL = NULL;
-            }
-        }
         // Update phhone
         $patient->Mobile = $request->Mobile;
+
+        if($request->hasFile('img')){
+            // Delete existing image if it exists
+            if ($patient->ImageURL != NULL && Storage::exists($patient->ImageURL)) {
+                Storage::delete($patient->ImageURL);
+            }
+            $image = $request->file('img');
+            $imageName = "$patient->PatientId-$patient->Registration_No."
+                    . $image->getClientOriginalExtension();
+            $image->storeAs('public/patient/profileImg', $imageName);
+            $patient->ImageURL = "public/patient/profileImg/$imageName";
+        }elseif ($request->has('deleteImg') && $request->deleteImg) {
+            if ($patient->ImageURL != NULL && Storage::exists($patient->ImageURL)) {
+                Storage::delete($patient->ImageURL);
+            }
+            $patient->ImageURL = NULL;
+        }
         // Save changes
         $patient->save();
         return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
