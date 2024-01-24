@@ -80,6 +80,9 @@ class PatientController extends Controller
                 $request->user()->PatientId,
                 $request->user()->Hospital_ID,
             ]);
+            foreach ($data as $item) {
+                $item->resultPDF = url('/')."/api/RedioPDF/$item->OrdDtlID";
+            }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;

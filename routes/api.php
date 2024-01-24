@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\PDFController;
 use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,7 +30,6 @@ Response Status
 */
 
 // Auth Routs
-// Route::post('/PDF', [DepartmentController::class, 'generatePDF']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/setNewPass', [AuthController::class, 'setNewPass']);
@@ -59,6 +59,9 @@ Route::post('/complaints/make', [SettingController::class,'makeComplaint']);
 
 //Garded Routs
 Route::middleware('auth:sanctum')->group(function () {
+    // user PDF
+    Route::get('/RedioPDF/{id}', [PDFController::class, 'RedioPDF']);
+
     // patients Routs
     Route::group(['prefix' => 'patient'], function () {
         Route::post('/info', function (Request $request) {
