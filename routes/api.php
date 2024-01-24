@@ -57,10 +57,11 @@ Route::group(['prefix' => 'patient'], function () {
 Route::get('/basicData', [SettingController::class,'index']);
 Route::post('/complaints/make', [SettingController::class,'makeComplaint']);
 
+// user PDF
+Route::get('/RedioPDF/{id}', [PDFController::class, 'RedioPDF']);
+
 //Garded Routs
 Route::middleware('auth:sanctum')->group(function () {
-    // user PDF
-    Route::get('/RedioPDF/{id}', [PDFController::class, 'RedioPDF']);
 
     // patients Routs
     Route::group(['prefix' => 'patient'], function () {

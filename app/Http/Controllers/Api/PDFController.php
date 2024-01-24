@@ -12,19 +12,16 @@ class PDFController extends Controller
     public function RedioPDF($id, Request $request)
     {
         try {
-            $data = DB::select('usp_app_apiGetAllRadioDatewise ?, ?', [
-                $request->user()->PatientId,
-                $request->user()->Hospital_ID,
+            $data = DB::select('usp_app_apiGetRadioID ?', [
+                $id,
             ]);
-            $data = collect($data)->filter(function ($item) use ($id) {
-                return $item->OrdDtlID == $id;
-            })->values()->first();
+            $data = $data[0];
             $data2 = DB::select('usp_app_apiGetPatientRadioResult ?', [
                 $id,
             ]);
             $data->RadiologyResult = $data2[0]->RadiologyResult;
             $pdf = PDF::loadView('RedioReport', compact('data'));
-            return $pdf->download("RedioReport-".$request->user()->Registration_No."-$id.pdf");
+            return $pdf->download("RedioReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
