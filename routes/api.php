@@ -69,6 +69,8 @@ Route::middleware('auth:sanctum')->group(function () {
             if($data->ImageURL != NULL){
                 if (Storage::exists($data->ImageURL)) {
                     $data->ImageURL = url('/').Storage::url($data->ImageURL);
+                }else{
+                    $data->ImageURL = NULL;
                 }
             }else{
                 $data->ImageURL = NULL;

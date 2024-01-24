@@ -36,7 +36,7 @@ class PatientController extends Controller
             $image = $request->file('img');
             $imageName = "$patient->PatientId-$patient->Registration_No."
                     . $image->getClientOriginalExtension();
-            $image->storeAs('public/patient/profileImg', $imageName);
+            $image->move('storage/patient/profileImg', $imageName);
             $patient->ImageURL = "public/patient/profileImg/$imageName";
         }elseif ($request->has('deleteImg') && $request->deleteImg) {
             if ($patient->ImageURL != NULL && Storage::exists($patient->ImageURL)) {
