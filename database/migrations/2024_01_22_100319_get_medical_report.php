@@ -21,7 +21,7 @@ return new class extends Migration
 
         DB::unprepared("
             create proc [dbo].[usp_app_apiPatientMedicalReport]   
-            @VisitId INT                  
+            @PatientId INT                  
             AS                  
             BEGIN                  
                             
@@ -58,10 +58,10 @@ return new class extends Migration
                 case when visit.VisitTypeID<>1 then AdmissionRequest.ReqDateTime else visit.VisitDate end as Expecteddate,                              
                 D1.Department_Name As DocDepartment, ReasonforConsultation, Historyofillness, initialDignosis, AssociatedDignosis, Significantsigns,                             
                                     
-                (select top 1 ICD_Code from ctpl_OPInitail_Conclusion where VisitId = @VisitId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id) As ICD1,                              
-                (select top 1 ICD_Code from (select top 2 ICD_Code from ctpl_OPInitail_Conclusion where VisitId = @VisitId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD2) As ICD2,                              
-                (select top 1 ICD_Code from (select top 3 ICD_Code from ctpl_OPInitail_Conclusion where VisitId = @VisitId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD3) As ICD3,                              
-                (select top 1 ICD_Code from (select top 4 ICD_Code from ctpl_OPInitail_Conclusion where VisitId = @VisitId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD4) As ICD4,                              
+                (select top 1 ICD_Code from ctpl_OPInitail_Conclusion where dbo.Patient.PatientId = @PatientId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id) As ICD1,                              
+                (select top 1 ICD_Code from (select top 2 ICD_Code from ctpl_OPInitail_Conclusion where dbo.Patient.PatientId = @PatientId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD2) As ICD2,                              
+                (select top 1 ICD_Code from (select top 3 ICD_Code from ctpl_OPInitail_Conclusion where dbo.Patient.PatientId = @PatientId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD3) As ICD3,                              
+                (select top 1 ICD_Code from (select top 4 ICD_Code from ctpl_OPInitail_Conclusion where dbo.Patient.PatientId = @PatientId and DignosisType_Type = 'INITIAL' order by ICDDiagnosis_Id desc) As ICD4) As ICD4,                              
                 ChronicChk, CongenitalChk, RTAChk, CheckupChk, WorkRelatedChk, PsychiatricChk, InfertilityChk, PregnancyChk, VaccinationChk, LMP  ,                          
             Durationofillness, GeneralExamination, isSportsRelated , Visit.visitage,            
             dbo.fn_DoctorFullName(@CMODrEmpId) AS CMODoctorName,      
@@ -81,7 +81,7 @@ return new class extends Migration
                 left join dbo.MaritalStatus_Mst on patient.MaritalStatus=MaritalStatus_Mst.Status_ID                  
                 left join AdmissionRequest on AdmissionRequest.VisitID=Visit.Visit_ID                              
                 left join EMR_DDMRRecArabic MRA on Visit.Visit_Id = MRA.VisitId            
-            WHERE dbo.Visit.Visit_ID = @VisitId  and isnull(Ctpl_OpInitialAssessment.CANCELLED,0)=0              
+            WHERE dbo.Patient.PatientId = @PatientId  and isnull(Ctpl_OpInitialAssessment.CANCELLED,0)=0 order by Visit.VisitDate desc     
                             
             END
         ");

@@ -96,6 +96,9 @@ class PatientController extends Controller
             $data = DB::select('usp_app_apigetLabPatwiseResults ?', [
                 $request->user()->PatientId,
             ]);
+            foreach ($data as $item) {
+                $item->labPDF = url('/')."/api/labPDF/$item->LabNo";
+            }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
@@ -133,6 +136,9 @@ class PatientController extends Controller
                 $request->user()->PatientId,
                 $request->user()->Hospital_ID,
             ]);
+            foreach ($data as $item) {
+                $item->prescriptionPDF = url('/')."/api/prescriptionsPDF/$item->PreID";
+            }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             return $th;
@@ -157,6 +163,10 @@ class PatientController extends Controller
                 $request->month,
                 $request->year,
             ]);
+            foreach ($data as $item) {
+                $queryParameters = http_build_query(['billNo' => $item->BillNo]);
+                $item->billPDF = url("/api/billPDF?$queryParameters");
+            }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
@@ -377,6 +387,27 @@ class PatientController extends Controller
             }
         } catch (\Throwable $th) {
             throw $th;
+            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+        }
+    }
+
+    function medicalRport(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'Visit_ID' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        }
+        try {
+            $data = DB::select('usp_app_apiPatientMedicalReport ?', [
+                $request->Visit_ID,
+            ]);
+            foreach ($data as $item) {
+                $item->medicalPDF = url('/')."/api/medicalPDF/$item->Visit_ID";
+            }
+            return response()->json(['data' => $data, 'status' => 200]);
+        } catch (\Throwable $th) {
+            // throw $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
     }
