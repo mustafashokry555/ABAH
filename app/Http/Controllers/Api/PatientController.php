@@ -392,12 +392,7 @@ class PatientController extends Controller
     }
 
     function medicalRport(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'Visit_ID' => 'required|integer',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
-        }
+        
         try {
             $data = DB::select('usp_app_apiPatientMedicalReportById ?', [
                 $request->user()->PatientId
