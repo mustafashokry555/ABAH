@@ -399,8 +399,8 @@ class PatientController extends Controller
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
         try {
-            $data = DB::select('usp_app_apiPatientMedicalReport ?', [
-                $request->Visit_ID,
+            $data = DB::select('usp_app_apiPatientMedicalReportById ?', [
+                $request->user()->PatientId
             ]);
             foreach ($data as $item) {
                 $item->medicalPDF = url('/')."/api/medicalPDF/$item->Visit_ID";
