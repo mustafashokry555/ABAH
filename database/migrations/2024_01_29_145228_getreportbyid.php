@@ -33,7 +33,10 @@ return new class extends Migration
                                 
             SELECT                        
             dbo.Patient.Registration_No, dbo.Visit.VisitNo, dbo.Visit.PatientID, dbo.Visit.VisitTypeID, dbo.Visit.Visit_ID, dbo.Visit.DocInCharge,                   
-                dbo.fn_DoctorFullName(dbo.Visit.DocInCharge) AS DoctorName, dbo.Gender_Mst.Description,                   
+            (N'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName) AS DoctorName  
+            ,(N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName) AS DoctorNameAr  
+            ,D1.Department_Name AS DoctorSpeciality  
+            ,D1.Department_Name_Arabic AS DoctorSpecialityAr , dbo.Gender_Mst.Description,                   
                 dbo.Visit.VisitDate, dbo.Visit.Age, (dbo.Title_Mst.Title_Name + ' ' + dbo.Patient.First_Name + ' ' +   dbo.Patient.Middle_Name + ' ' + dbo.Patient.ThirdName + ' '+    dbo.Patient.Last_Name) AS PtNm ,                
                             
                 dbo.Ctpl_OpInitialAssessment.Dischargeto, dbo.Ctpl_OpInitialAssessment.ReasonforConsultation,                   

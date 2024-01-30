@@ -32,9 +32,15 @@ return new class extends Migration
 
                 If @Count>0
                 Begin
-                    Select Visit_ID,VisitNo,convert(varchar,VisitDate,105) as VisitDate,SUBSTRING(CONVERT(varchar,VisitDate,108),1,5) AS VisitTime,dbo.fn_DoctorFullName(V.DocInCharge) as DoctorName,Department_Name as DepartmentName,1 as Id 
+                    Select Visit_ID,VisitNo,convert(varchar,VisitDate,105) as VisitDate,
+                    SUBSTRING(CONVERT(varchar,VisitDate,108),1,5) AS VisitTime,
+                    (N'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName) AS DoctorName  
+                    ,(N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName) AS DoctorNameAr  
+                    ,DM.Department_Name AS DoctorSpeciality  
+                    ,DM.Department_Name_Arabic AS DoctorSpecialityAr ,1 as Id 
                     from Visit V inner join Patient P on V.PatientID=P.PatientId
                     inner join Department_Mst DM on V.DepartmentID=DM.Department_ID
+                    inner join dbo.Employee_Mst on Visit.DocInCharge = Employee_Mst.EmpID 
                     Where P.PatientId=@PatientId and V.LocationID=@UnitNo
                     order by V.VisitDate desc
                 End

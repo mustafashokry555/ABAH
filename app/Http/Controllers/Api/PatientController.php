@@ -149,20 +149,18 @@ class PatientController extends Controller
 
     function bills(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'month' => 'required',
-            'year' => 'required',
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'month' => 'required',
+        //     'year' => 'required',
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        // }
         try {
-            $data = DB::select('usp_apiGetAllInvoices ?, ?, ?, ?', [
+            $data = DB::select('usp_app_BollByID ?, ?', [
                 $request->user()->Registration_No,
                 $request->user()->Hospital_ID,
-                $request->month,
-                $request->year,
             ]);
             foreach ($data as $item) {
                 $queryParameters = http_build_query(['billNo' => $item->BillNo]);
