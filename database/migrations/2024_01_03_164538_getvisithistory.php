@@ -32,10 +32,11 @@ return new class extends Migration
 
                 If @Count>0
                 Begin
-                    Select Visit_ID,VisitNo,convert(varchar,VisitDate,105) as VisitDate,SUBSTRING(CONVERT(varchar,VisitDate,108),1,5) AS VisitTime,dbo.fn_DoctorFullName(V.DocInCharge) as DoctorName,Department_Name as DepartmentName,1 as Id from Visit V inner join Patient P on V.PatientID=P.PatientId
+                    Select Visit_ID,VisitNo,convert(varchar,VisitDate,105) as VisitDate,SUBSTRING(CONVERT(varchar,VisitDate,108),1,5) AS VisitTime,dbo.fn_DoctorFullName(V.DocInCharge) as DoctorName,Department_Name as DepartmentName,1 as Id 
+                    from Visit V inner join Patient P on V.PatientID=P.PatientId
                     inner join Department_Mst DM on V.DepartmentID=DM.Department_ID
                     Where P.PatientId=@PatientId and V.LocationID=@UnitNo
-                    order by VisitDate desc
+                    order by V.VisitDate desc
                 End
                 Else
                 Begin

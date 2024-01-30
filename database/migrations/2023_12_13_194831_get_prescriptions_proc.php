@@ -81,6 +81,7 @@ return new class extends Migration
                             LEFT OUTER JOIN dbo.Ctpl_OpInitialAssessment ON dbo.Ctpl_OpInitialAssessment.VisitId = dbo.Visit.Visit_ID
                             WHERE --(convert(datetime,convert(varchar,dbo.Visit.VisitDate,106)) BETWEEN @FromDate AND @ToDate) 
                             dbo.Patient.PatientId = @PatientId  and ISNULL(WD_Prescription_Details.IsCancelled,0) <> 1
+                            order by Visit.VisitDate desc
                     End
                     Else
                     Begin

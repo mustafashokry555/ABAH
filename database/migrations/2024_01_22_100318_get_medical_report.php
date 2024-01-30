@@ -81,7 +81,8 @@ return new class extends Migration
                 left join dbo.MaritalStatus_Mst on patient.MaritalStatus=MaritalStatus_Mst.Status_ID                  
                 left join AdmissionRequest on AdmissionRequest.VisitID=Visit.Visit_ID                              
                 left join EMR_DDMRRecArabic MRA on Visit.Visit_Id = MRA.VisitId            
-            WHERE dbo.Visit.Visit_ID = @VisitId  and isnull(Ctpl_OpInitialAssessment.CANCELLED,0)=0              
+            WHERE dbo.Visit.Visit_ID = @VisitId  and isnull(Ctpl_OpInitialAssessment.CANCELLED,0)=0      
+            order by Visit.VisitDate desc       
                             
             END
         ");
