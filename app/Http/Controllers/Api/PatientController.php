@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use DateTime;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -302,9 +303,9 @@ class PatientController extends Controller
         try {
             $newAppointment = DB::table('Ds_PatientAppoinmentTemperary')
                 ->insert([$row]);
-            return response()->json(['message' => 'Your Appointment has been Updated Successfully!', 'status' => 200]);
+            return '1';
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return response()->json(['errors' => 'Database Error !', 'status' => 500]);
         }
     }
@@ -338,7 +339,22 @@ class PatientController extends Controller
             if (!empty($avilSlot)) {
                 if (empty(trim($avilSlot->sub)) && $avilSlot->PatientId == 0) {
                     // continue the booking
-                    return $this->addTheAppoint($request);
+                    $bookResult = $this->addTheAppoint($request);
+                    if($bookResult == '1'){
+                        $userphone = Auth::guard('api')->user()->Mobile;
+                        if ($userphone) {
+                            $smsRes = $this->sendSms($userphone, $request);
+                        }else{
+                            $smsRes = $this->sendSms($request->Mobile, $request);
+                        }
+                        if($smsRes){
+                            return response()->json(['message' => 'Your Appointment has been Updated Successfully And SMS massage sent Successfully!', 'status' => 200]);
+                        }else{
+                            return response()->json(['message' => 'Your Appointment has been Updated Successfully But SMS massage faild!', 'status' => 200]);
+                        }
+                    }else{
+                        return $bookResult;
+                    }
                 }else{
                     // show message that slot is not available
                     return response()->json([
@@ -355,6 +371,42 @@ class PatientController extends Controller
             Please select another doctor or check the availability of the doctor.'], 'status' =>
             422]);
         }
+    }
+
+    function sendSms($phone, $request){
+        $doctor = DB::table("Employee_Mst")
+            ->where('Employee_Mst.EmpID', $request->doctor_id)
+            ->select(
+                DB::raw("'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName AS DoctorName"),
+                DB::raw("N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName AS DoctorNameAr"),
+                )
+            ->first();
+        $text = "Your Appointment has been Updated Successfully with:  \n\r".
+        "$doctor->DoctorName  \n\r".
+        "$doctor->DoctorNameAr \n\r".
+        "on:  \n\r".
+        "$request->DATE  at: $request->SlotsTime \n\r".
+        "And you will receve a confirmation call from us.\n
+        \r\n".
+        "Regards,\n".
+        "ABAH";
+        $url = "http://46.151.210.31:8080/websmpp/websms";
+        $params = [
+            'user' => 'Alibinali',
+            'pass' => 'Waleed@23',
+            'sid' => 'ABAH',
+            'mno' => "966$phone",
+            'type' => 1,
+            'text' => $text,
+            'respformat' => 'json',
+        ];
+        $client = new Client();
+        $response = $client->request('GET', $url, ['query' => $params]);
+        $responseCode = $response->getStatusCode();
+        $responseBody = json_decode($response->getBody());
+
+        if ($responseCode == 200 && isset($responseBody->Response) && is_numeric($responseBody->Response[0]))
+        {return true;} else {return false;}
     }
 
     function cancelAppointment(Request $request)
