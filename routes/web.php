@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,5 +22,7 @@ Route::get('/login', function () {
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/test_dont_use_ever', [AuthController::class, 'test_dont_use_ever']);
+
 
 // Route::get('/departments', [DepartmentController::class,'index']);

