@@ -413,27 +413,26 @@ class PatientController extends Controller
             'TempId' => 'required|integer',
             'PatientId' => 'required|integer',
             'AppCode' => 'required',
-            'APPDate' => 'required|date_format:Y-m-d',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors(), 'status' => 422]);
         }
         try {
-            $data = DB::statement('EXEC usp_app_api_DeleteAppointment ?, ?, ?, ?, ?', [
-                // 96060,
+            $data = DB::select('usp_app_api_DeleteAppointment ?, ?, ?, ?', [
                 $request->TempId,
-                // 24894,
                 $request->PatientId,
-                // 'WA/202308/94269',
                 $request->AppCode,
-                // '2023-08-13',
-                $request->APPDate,
                 1
             ]);
-            if ($data) {
-                return response()->json(['message' => 'Your Appointment has been Deleted Successfully!', 'status' => 200]);
+            if (!empty($data)) {
+                $data = $data[0];
+                if($data->Id == 1){
+                    return response()->json(['message' => "Appointment is CANCELED Successfully", 'status' => 200]);
+                }else{
+                    return response()->json(['errors' => $data->Msg, 'status' => 500]);
+                }
             } else {
-                return response()->json(['errors' => $data, 'status' => 500]);
+                return response()->json(['errors' => "Database Error !", 'status' => 500]);
             }
         } catch (\Throwable $th) {
             throw $th;
