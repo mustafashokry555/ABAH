@@ -24,7 +24,7 @@
         }
 
         footer {
-            background-color: #333;
+            background-color: #B21F24;
             color: #fff;
             text-align: center;
             position: fixed;
@@ -47,7 +47,7 @@
         }
 
         th {
-            background-color: #333;
+            background-color: #B21F24;
             color: #fff;
         }
 
