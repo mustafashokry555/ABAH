@@ -40,7 +40,7 @@ return new class extends Migration
                     ,DM.Department_Name_Arabic AS DoctorSpecialityAr ,1 as Id 
                     from Visit V inner join Patient P on V.PatientID=P.PatientId
                     inner join Department_Mst DM on V.DepartmentID=DM.Department_ID
-                    inner join dbo.Employee_Mst on Visit.DocInCharge = Employee_Mst.EmpID 
+                    inner join dbo.Employee_Mst on V.DocInCharge = Employee_Mst.EmpID 
                     Where P.PatientId=@PatientId and V.LocationID=@UnitNo
                     order by V.VisitDate desc
                 End
