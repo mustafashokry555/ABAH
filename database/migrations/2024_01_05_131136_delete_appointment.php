@@ -29,9 +29,9 @@ return new class extends Migration
             Declare @appstatus as Nvarchar(50),@Count as Int
             BEGIN
                 select @Count=COUNT(*) from Ds_PatientAppoinmentTemperary where PatientId=@PatientId and AppointmentCode=@AppCode 
-				--and app_date>=CONVERT(varchar,GETDATE(),23)
+				and app_date>=CONVERT(varchar,GETDATE(),23)
                 Select @appstatus=ApntStatus from Ds_PatientAppoinmentTemperary where PatientId=@PatientId and AppointmentCode=@AppCode
-				--and app_date>=CONVERT(varchar,GETDATE(),23)
+				and app_date>=CONVERT(varchar,GETDATE(),23)
 
                 --select * from Ds_PatientAppoinmentTemperary
                 If @Count>0
