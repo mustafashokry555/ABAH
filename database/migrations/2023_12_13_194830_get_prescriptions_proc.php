@@ -48,8 +48,10 @@ return new class extends Migration
 
                         SELECT  
                             dbo.fn_PatientFullName(dbo.Patient.PatientId) AS PatientName ,
-                            dbo.fn_DoctorFullName(( dbo.Visit.DocInCharge )) AS DocInCharge ,
-                            dbo.fn_GetDocDept(dbo.Visit.DocInCharge) AS Specialty,
+                            (N'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName) AS DocInCharge  
+                            ,(N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName) AS DocInChargeAr  
+                            ,D1.Department_Name AS Specialty  
+                            ,D1.Department_Name_Arabic AS SpecialtyAr ,
                             WD_Prescription_Mst.PreID,WD_Prescription_Details.PreDetailID,Visit.VisitTypeID,WD_Prescription_Mst.PreCode,WD_Prescription_Details.GenericID,
                             convert(varchar,dbo.Visit.VisitDate,105) AS VisitDate ,
                             dbo.Ctpl_OpInitialAssessment.ReasonforConsultation AS [Cheif Complaint],
@@ -77,6 +79,8 @@ return new class extends Migration
                             INNER JOIN HomeMedicationRoute_Mst ON HomeMedicationRoute_Mst.Id = WD_Prescription_Details.HM_routeId
                             INNER JOIN wd_prescriptionFrequency ON wd_prescriptionFrequency.Frequency_Id = WD_Prescription_Details.Frequency
                             INNER JOIN ivitem ON WD_Prescription_Details.ItemId = ivitem.id 
+                            inner join dbo.Employee_Mst on Visit.DocInCharge = Employee_Mst.EmpID                            
+                            inner join dbo.Department_Mst D1 on Employee_Mst.Department_ID = D1.Department_ID
                             LEFT OUTER JOIN DrugSaleDtl ON DrugSaleDtl.DetailID=WD_Prescription_Details.PreDetailID
                             LEFT OUTER JOIN dbo.Ctpl_OpInitialAssessment ON dbo.Ctpl_OpInitialAssessment.VisitId = dbo.Visit.Visit_ID
                             WHERE --(convert(datetime,convert(varchar,dbo.Visit.VisitDate,106)) BETWEEN @FromDate AND @ToDate) 
