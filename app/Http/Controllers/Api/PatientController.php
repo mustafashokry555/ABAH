@@ -384,7 +384,7 @@ class PatientController extends Controller
         "$doctor->DoctorNameAr \n\r".
         "on:  \n\r".
         "$request->DATE  at: $request->SlotsTime \n\r".
-        "And you will receve a confirmation call from us.\n
+        "And you will receve a confirmation SMS from us.\n
         \r\n".
         "Regards,\n".
         "ABAH";

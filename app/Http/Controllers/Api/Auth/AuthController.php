@@ -68,7 +68,7 @@ class AuthController extends Controller
     public function generateOtp(Patient $patient, $reason)
     {
         // $otp = 999999;
-        $otp = rand(100000, 999999);
+        $otp = rand(1000, 9999);
         // if Patient count >= 4 don't create new one 
         if ($patient->OTP_Request_Count >=4 ){
             $lastOtp = Otp::where('patient_id', $patient->PatientId)
@@ -149,7 +149,7 @@ class AuthController extends Controller
     function setNewPass(Request $request){
         $validator = Validator::make($request->all(), [
             'Registration_No' => 'required',
-            'otp' => 'required|numeric|digits:6',
+            'otp' => 'required|numeric|digits:4',
             'password' => 'required|min:6|confirmed',
         ]);
         if ($validator->fails()) {
