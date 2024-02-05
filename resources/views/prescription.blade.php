@@ -23,14 +23,14 @@
             height: auto;
         }
 
-        footer {
+        /* footer {
             background-color: #B21F24;
             color: #fff;
             text-align: center;
             position: fixed;
             bottom: 0;
             width: 100%;
-        }
+        } */
 
         table {
             width: 95%;
@@ -97,10 +97,10 @@
         </tbody>
     </table>
 
-    <footer>
+    {{-- <footer>
         <p>Prescription issued by Dr. John Doe, MD</p>
         <p>For any concerns, please contact our pharmacy: +1-123-456-7890</p>
-    </footer>
+    </footer> --}}
 
 </body>
 </html>

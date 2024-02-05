@@ -14,7 +14,7 @@ class DepartmentController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 }

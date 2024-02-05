@@ -24,7 +24,7 @@ class AuthController extends Controller
             'Mobile' => 'required', 
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         $patient = Patient::where('Registration_No', $request->Registration_No)->first();
         if($patient){
@@ -40,25 +40,29 @@ class AuthController extends Controller
                         
                     }else{
                         return response()->json([
-                            'errors' => "This Account is already registered.",
+                            'error' => "This Account is already registered.",
+                            'errorAr' => 'هذا الحساب مسجل, يرجى تسجيل الدخول',
                             'status' => 422
                         ]);
                     }
                 }else{
                     return response()->json([
-                        'errors' => "This Account is Deactive, Please contact the hospital to activate your account.",
+                        'error' => "This Account is Deactive, Please contact the hospital to activate your account.",
+                        'errorAr' => 'هذا الحساب محظور, يرجى التواصل بخدمه العملاء.',
                         'status' => 422
                     ]);
                 }
             }else{
                 return response()->json([
-                    'errors' => "This Mobile Number not valid for this medical file.",
+                    'error' => "This Mobile Number not valid for this medical file.",
+                    'errorAr' => 'هذا الرقم غير مسجل لهذا الملف الطبي.',
                     'status' => 422
                 ]);
             }
         }else{
             return response()->json([
-                'errors' => "This Medical file Not exist in our recoreds.",
+                'error' => "This Medical file Not exist in our recoreds.",
+                'errorAr' => 'هذا الملف الطبي غير موجود.',
                 'status' => 422
             ]);
         }
@@ -91,8 +95,6 @@ class AuthController extends Controller
         
         // Send SMS with the generated otp to patient mobile number
         $res = $this->sendSms($patient->Mobile ,$otp );
-        // $res = true;
-        // return $res;
         if($res){
             $patient->OTP = $otp;
             $patient->save();
@@ -105,22 +107,21 @@ class AuthController extends Controller
             $firstDigits = substr($patient->Mobile, 0, 1);
             $lastDigits = substr($patient->Mobile, -3);
             return response()->json([
-                "message" => "We Send you an OTP on your phone: +966$firstDigits"."xxxxx$lastDigits .",
-                "status" => 200
-            ]);   
+                'message' => "We Send you an OTP on your phone: +966$firstDigits"."xxxxx$lastDigits .",
+                'messageAr' => "تم ارسال رقم التاكيدعلر رقم: +966$firstDigits"."xxxxx$lastDigits .",
+                'status' => 200
+                ]);
         }else{
             return response()->json([
-                'errors' => "Send SMS Error!",
+                'error' => "Send SMS Error!",
+                'errorAr' => "خطأ في ارسال الرساله!",
                 'status' => 422
             ]);
         }
-
-        // return response()->json(['message' => 'OTP generated successfully']);
     }
 
     function sendSms($phone, $otp){
         // send the sms massage throw api
-        // return "966$phone";
         $text = "Your One Time Password (OTP) is : $otp \n\r".
         "This code will expire in 5 minutes.\n\r".
         "Do Not shere it with Others.\n
@@ -153,7 +154,7 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         // check if the old pass = the auth pass
         $patient = Patient::where('Registration_No', $request->Registration_No)->first();
@@ -169,29 +170,29 @@ class AuthController extends Controller
                     $patient->OTP_Request_Count = 0;
                     $patient->OTP = NULL;
                     $patient->save();
-                    return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
-                    // if($request->otp == 1157479852){
-                    // }else{
-                    //     return response()->json([
-                    //         'errors' => "This OTP Number not valid.",
-                    //         'status' => 422
-                    //     ]);
-                    // }
+                    return response()->json([
+                        'message' => "Your password has been Updated Successfully!",
+                        'messageAr' => "تم تحديث البيانات بنجاحز",
+                        'status' => 200
+                        ]);
                 }else{
                     return response()->json([
-                        'errors' => "This OTP Number not valid.",
+                        'error' => "This OTP Number not valid.",
+                        'errorAr' => "رقم التاكديد غير صحيح!",
                         'status' => 422
                     ]);
                 }
             }else{
                 return response()->json([
-                    'errors' => "This OTP Number is Expired.",
+                    'error' => "This OTP Number is Expired.",
+                    'errorAr' => "رقم التاكديد منتهى!",
                     'status' => 422
                 ]);
             }
         }else{
             return response()->json([
-                'errors' => "This Medical file Not exist in our recoreds.",
+                'error' => "This Medical file Not exist in our recoreds.",
+                'errorAr' => "رقم رقم الملف غبر صحيح!",
                 'status' => 422
             ]);
         }
@@ -202,14 +203,15 @@ class AuthController extends Controller
             'Registration_No' => 'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         $patient = Patient::where('Registration_No', $request->Registration_No)->first();
         if($patient){
             return $this->generateOtp($patient, "Forget Password");
         }else{
             return response()->json([
-                'errors' => "This Medical file Not exist in our recoreds.",
+                'error' => "This Medical file Not exist in our recoreds.",
+                'errorAr' => "رقم رقم الملف غبر صحيح!",
                 'status' => 422
             ]);
         }
@@ -226,7 +228,7 @@ class AuthController extends Controller
         ]);
         if (isset($result[0]->Id) && in_array($result[0]->Id, [-1, -2, -3])) {
             // No details available or OTP count exceeded
-            return response()->json(['errors' => $result[0]->Msg, 'status' => 401]);
+            return response()->json(['error' => $result[0]->Msg, 'errorAr' => $result[0]->Msg, 'status' => 422]);
         } elseif (isset($result[0]->Registration_No) && $result[0]->Registration_No == $credentials['userId']) {
 
             $expirationTime = now()->addDays(7);
@@ -235,8 +237,6 @@ class AuthController extends Controller
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
             return response()->json(['token' => $token, 'status' => 200]);
         }
-
-        // return response()->json(['error' => 'Invalid credentials'], 401);
     }
 
     function changePass(Request $request){
@@ -245,16 +245,25 @@ class AuthController extends Controller
             'newPassword' => 'required|min:6|confirmed',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         // check if the old pass = the auth pass
         $Patient = $request->user();
         if($Patient->patient_password == base64_encode($request->oldPassword)){
             $Patient->patient_password = base64_encode($request->newPassword);
             $Patient->save();
-            return response()->json(['massege' => "Your password has been Updated Successfully!", 'status' => 422]);
+            return response()->json([
+                'message' => "Your password has been Updated Successfully.",
+                'messageAr' => "تم التحديث بنجاح.",
+                'status' => 200
+                ]);
+            
         }else{
-            return response()->json(['errors' => "The Old password is not correct!", 'status' => 422]);
+            return response()->json([
+                'error' => "The Old password is not correct!",
+                'errorAr' => "الرقم السرى القديم غير صحيح!",
+                'status' => 422
+            ]);
         }
     }
 
@@ -265,7 +274,11 @@ class AuthController extends Controller
         // Revoke all tokens for the authenticated user
         $user->tokens()->delete();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json([
+            'message' => "Successfully logged out.",
+            'messageAr' => "تم تسجيل الخروج.",
+            'status' => 200
+            ]);
     }
 
     public function test_dont_use_ever(Request $request)

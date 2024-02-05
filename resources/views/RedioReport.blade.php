@@ -24,15 +24,15 @@
             height: auto;
         }
 
-        footer {
+        /* footer {
             background-color: #B21F24;
             color: #fff;
             text-align: center;
-            /* padding: 10px 0; */
+            padding: 10px 0;
             position: fixed;
             bottom: 0;
             width: 100%;
-        }
+        } */
 
         table {
             width: 95%;
@@ -102,10 +102,10 @@
         </tbody>
     </table>
 
-    <footer>
+    {{-- <footer>
         <p>For inquiries, call our 24/7 helpline: +1-123-456-7890</p>
         <p>Follow us on <a href="https://www.facebook.com/hospitalpage" target="_blank">Facebook</a></p>
-    </footer>
+    </footer> --}}
 
 </body>
 </html>

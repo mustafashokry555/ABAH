@@ -24,7 +24,7 @@ class PDFController extends Controller
             return $pdf->download("RedioReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -38,7 +38,7 @@ class PDFController extends Controller
             return $pdf->download("prescription-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -53,7 +53,7 @@ class PDFController extends Controller
             return $pdf->download("medicalReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -70,7 +70,7 @@ class PDFController extends Controller
             return $pdf->download("labReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -86,7 +86,7 @@ class PDFController extends Controller
             return $pdf->download("billPDF-$request->billNo.pdf");
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 }

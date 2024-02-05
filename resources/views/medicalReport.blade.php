@@ -23,7 +23,7 @@
             height: auto;
         }
 
-        footer {
+        /* footer {
             background-color: #B21F24;
             color: #fff;
             text-align: center;
@@ -31,7 +31,7 @@
             bottom: 0;
             width: 100%;
             padding: 10px 0;
-        }
+        } */
 
         table {
             width: 100%;
@@ -110,10 +110,10 @@
         <!-- Add more physical examination details as needed -->
     </section>
 
-    <footer>
+    {{-- <footer>
         <p>Medical Report issued by Dr. {{ $data->DoctorName }}, {{ $data->DocDepartment }}</p>
         <p>Contact our hospital at: +1-123-456-7890</p>
-    </footer>
+    </footer> --}}
 
 </body>
 </html>

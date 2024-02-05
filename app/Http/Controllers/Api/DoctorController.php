@@ -42,7 +42,7 @@ class DoctorController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -51,26 +51,30 @@ class DoctorController extends Controller
             'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
-        $data = DB::table('Employee_Mst')
-        ->leftJoin('app_doctor_details', 'Employee_Mst.EmpID', '=', 'app_doctor_details.doctor_id')
-        ->leftJoin('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
-        ->where('EmpID', '=', $doctor_id)
-        ->select(
-            'Employee_Mst.EmpID',
-            DB::raw("N'Dr. ' + FirstName + ' ' + MiddleName + ' ' + LastName AS DoctorName"),
-            DB::raw("N'د. ' + R_FirstName + ' ' + R_MiddleName + ' ' + R_LastName AS DoctorNameAr"),
-            DB::raw("FORMAT(Employee_Mst.BirthDate, 'yyyy-MM-dd') as BirthDate"),
-            'Employee_Mst.Gender',
-            DB::raw('Department_Mst.Department_ID AS DepartmentId'),
-            DB::raw('Department_Mst.Department_Name AS speciality'),
-            DB::raw('Department_Mst.Department_Name_Arabic AS specialityAr'),
-            'app_doctor_details.*',
-            DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
-        )
-        ->first();
-        return response()->json(['data' => $data ,'status' => 200]);
+        try{
+            $data = DB::table('Employee_Mst')
+            ->leftJoin('app_doctor_details', 'Employee_Mst.EmpID', '=', 'app_doctor_details.doctor_id')
+            ->leftJoin('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
+            ->where('EmpID', '=', $doctor_id)
+            ->select(
+                'Employee_Mst.EmpID',
+                DB::raw("N'Dr. ' + FirstName + ' ' + MiddleName + ' ' + LastName AS DoctorName"),
+                DB::raw("N'د. ' + R_FirstName + ' ' + R_MiddleName + ' ' + R_LastName AS DoctorNameAr"),
+                DB::raw("FORMAT(Employee_Mst.BirthDate, 'yyyy-MM-dd') as BirthDate"),
+                'Employee_Mst.Gender',
+                DB::raw('Department_Mst.Department_ID AS DepartmentId'),
+                DB::raw('Department_Mst.Department_Name AS speciality'),
+                DB::raw('Department_Mst.Department_Name_Arabic AS specialityAr'),
+                'app_doctor_details.*',
+                DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
+            )
+            ->first();
+            return response()->json(['data' => $data ,'status' => 200]);
+        } catch(\Throwable $th) {
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        }
 
     }
 
@@ -80,7 +84,7 @@ class DoctorController extends Controller
             'day' => 'required|date_format:Y-m-d',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         try {
             $data = DB::select('usp_app_apiGetDocAppSlots ?, ?, ?, ?',[
@@ -92,7 +96,7 @@ class DoctorController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // throw $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -103,7 +107,7 @@ class DoctorController extends Controller
             'comment' => 'string|nullable',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         $dateTime = Carbon::now();
         try{
@@ -123,7 +127,11 @@ class DoctorController extends Controller
                     "created_at" => $dateTime,
                     "updated_at" => $dateTime
                     ]);
-                return response()->json(['message' => "Your Rating has been submitted successfully." ,'status' => 200]);
+                return response()->json([
+                    'message' => "Your Rating has been submitted successfully.",
+                    'messageAr' => "تم التقييم بنجاح.",
+                    'status' => 200
+                    ]);
             }else{
                 // update the rate
                 $rate = DB::table("app_rate_doctors")
@@ -133,11 +141,15 @@ class DoctorController extends Controller
                     "comment" => $request->comment??"",
                     "updated_at" => $dateTime
                 ]);
-                return response()->json(['message' => "Your Rating has been Updated successfully." ,'status' => 200]);
+                return response()->json([
+                    'message' => "Your Rating has been Updated successfully.",
+                    'messageAr' => "تم التحديث بنجاح.",
+                    'status' => 200
+                    ]);
             }
         } catch (\Throwable $th) {
-            return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            // return $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
 
     }

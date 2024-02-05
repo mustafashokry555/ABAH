@@ -22,7 +22,7 @@ class PatientController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         // Find the patient
         $patient = $request->user();
@@ -48,14 +48,15 @@ class PatientController extends Controller
         // Save changes
         $patient->save();
         return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
+        return response()->json([
+            'message' => "Patient data updated successfully.",
+            'messageAr' => "تم التحديث بنجاح.",
+            'status' => 200
+            ]);
     }
 
     function insurance(Request $request)
     {
-
-        if (!isset($request->user()->PatientId)) {
-            return response()->json(['errors' => 'The patient id field is required.', 'status' => 422]);
-        }
         try {
             $company = DB::select('usp_app_apiPatientInsuranceDetails ?', [
                 $request->user()->PatientId,
@@ -70,7 +71,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -87,7 +88,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -103,7 +104,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -126,7 +127,7 @@ class PatientController extends Controller
             return response()->json(['data' => $appointments, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -142,8 +143,8 @@ class PatientController extends Controller
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
-            return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            // return $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -155,7 +156,7 @@ class PatientController extends Controller
         // ]);
 
         // if ($validator->fails()) {
-        //     return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+        //     return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         // }
         try {
             $data = DB::select('usp_app_BollByID ?, ?', [
@@ -169,7 +170,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -185,7 +186,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -195,7 +196,7 @@ class PatientController extends Controller
             'doctor_id' => 'required|exists:Employee_Mst,EmpID,Deactive,0',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         try {
             $PatientId = $request->user()->PatientId;
@@ -207,7 +208,7 @@ class PatientController extends Controller
             return response()->json(['data' => $rate, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -228,9 +229,9 @@ class PatientController extends Controller
             // ->whereNull('Cancelled')
             ->count();
         if ($AppointmentCount > 0) {
-            return response()->json(['message' => "This time slot is already booked.", 'status' => 406]);
+            return response()->json(['error' => 'This Slot is already Booked!',
+                    'errorAr' => 'هذا الموعد محجوز!','status' => 422]);
         }
-        // return $AppointmentCount;
 
         // generate new AppointmentCode
         $lastAppointmentCode = DB::table('Ds_PatientAppoinmentTemperary')
@@ -281,7 +282,7 @@ class PatientController extends Controller
                 // 'Country' => 'required|date',
             ]);
             if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+                return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
             }
             // case the patient is Gest
             $row = array_merge($row, [
@@ -304,7 +305,7 @@ class PatientController extends Controller
             return '1';
         } catch (\Throwable $th) {
             // throw $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -320,7 +321,7 @@ class PatientController extends Controller
             ],
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
 
         $avilSlots = DB::select('usp_app_apiGetDocAppSlots ?, ?, ?, ?', [
@@ -346,28 +347,31 @@ class PatientController extends Controller
                             $smsRes = $this->sendSms($request->Mobile, $request);
                         }
                         if($smsRes){
-                            return response()->json(['message' => 'Your Appointment has been Updated Successfully And SMS massage sent Successfully!', 'status' => 200]);
+                            return response()->json([
+                                'message' => "Your Appointment has been Updated Successfully And SMS massage sent Successfully.",
+                                'messageAr' => "تم الحجز بنجاح, وارسال رساله تاكيد.",
+                                'status' => 200
+                                ]);
                         }else{
-                            return response()->json(['message' => 'Your Appointment has been Updated Successfully But SMS massage faild!', 'status' => 200]);
+                            return response()->json([
+                                'message' => "Your Appointment has been Updated Successfully But SMS massage faild!",
+                                'messageAr' => "تم الحجز بنجاح.",
+                                'status' => 200
+                                ]);
                         }
                     }else{
                         return $bookResult;
                     }
                 }else{
                     // show message that slot is not available
-                    return response()->json([
-                        "message" => "This Slot is already Booked by Someone else",
-                        "status" => 406
-                    ]);
+                    return response()->json(['error' => 'This Slot is already Booked!',
+                    'errorAr' => 'هذا الموعد محجوز!','status' => 422]);
                 }
             } else {
-                return response()->json(['errors' => ['No Available Slot Found!'], 'status' =>
-                422]);
+                return response()->json(['error' => 'No Available Slot Found!', 'errorAr' => 'لايوجد معاد متاح!','status' => 422]);
             }
         } else {
-            return response()->json(['errors' => ['Doctor is not available in selected date or time.
-            Please select another doctor or check the availability of the doctor.'], 'status' =>
-            422]);
+            return response()->json(['error' => 'Doctor is not available!', 'errorAr' => 'هذا الدكتور غير متاح!','status' => 422]);
         }
     }
 
@@ -415,7 +419,7 @@ class PatientController extends Controller
             'AppCode' => 'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(), 'status' => 422]);
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         }
         try {
             $data = DB::select('usp_app_api_DeleteAppointment ?, ?, ?, ?', [
@@ -427,16 +431,20 @@ class PatientController extends Controller
             if (!empty($data)) {
                 $data = $data[0];
                 if($data->Id == 1){
-                    return response()->json(['message' => "Appointment is CANCELED Successfully", 'status' => 200]);
+                    return response()->json([
+                        'message' => "Appointment is CANCELED Successfully.",
+                        'messageAr' => "تم الالغاء بنجاح.",
+                        'status' => 200
+                        ]);
                 }else{
-                    return response()->json(['errors' => $data->Msg, 'status' => 500]);
+                    return response()->json(['error' => $data->Msg, 'errorAr' => $data->Msg,'status' => 500]);
                 }
             } else {
-                return response()->json(['errors' => "Database Error !", 'status' => 500]);
+                return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
             }
         } catch (\Throwable $th) {
             throw $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 
@@ -452,7 +460,7 @@ class PatientController extends Controller
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // throw $th;
-            return response()->json(['errors' => 'Database Error !', 'status' => 500]);
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
 }
