@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
@@ -38,6 +39,18 @@ class DoctorController extends Controller
                 })->values()->all();
             }
 
+            foreach($data as $value){
+                if($value->DoctorImg != NULL){
+                    $value->DoctorImg = "public/doctor/profileImg/".basename($value->DoctorImg);
+                    if (Storage::exists($value->DoctorImg)) {
+                        $value->DoctorImg = url('/').Storage::url($value->DoctorImg);
+                    }else{
+                        $value->DoctorImg = NULL;
+                    }
+                }else{
+                    $value->DoctorImg = NULL;
+                }
+            }
 
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -71,6 +84,16 @@ class DoctorController extends Controller
                 DB::raw("(select CAST(AVG(CAST(rate AS DECIMAL(10, 2))) AS FLOAT) from app_rate_doctors where doctor_id = $doctor_id group by doctor_id) as rate"),
             )
             ->first();
+            if($data->profilePic != NULL){
+                $data->profilePic = "public/doctor/profileImg/".basename($data->profilePic);
+                if (Storage::exists($data->profilePic)) {
+                    $data->profilePic = url('/').Storage::url($data->profilePic);
+                }else{
+                    $data->profilePic = NULL;
+                }
+            }else{
+                $data->profilePic = NULL;
+            }
             return response()->json(['data' => $data ,'status' => 200]);
         } catch(\Throwable $th) {
             return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
@@ -145,7 +168,7 @@ class DoctorController extends Controller
                     'message' => "Your Rating has been Updated successfully.",
                     'messageAr' => "تم التحديث بنجاح.",
                     'status' => 200
-                    ]);
+                ]);
             }
         } catch (\Throwable $th) {
             // return $th;

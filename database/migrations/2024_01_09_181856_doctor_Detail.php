@@ -16,21 +16,21 @@ return new class extends Migration
 
         Schema::create('app_doctor_details', function (Blueprint $table) {
             $table->id();
-            $table->string('profilePic');
+            $table->string('profilePic')->nullable();
             $table->integer('doctor_id')->unsigned();
-            $table->string('nationality');
-            $table->string('nationalityAr');
+            $table->string('nationality')->nullable();
+            $table->string('nationalityAr')->nullable();
             // $table->string('gender');
-            $table->string('experience');
-            $table->string('experienceAr');
-            $table->string('lang');
-            $table->string('langAR');
-            $table->string('services');
-            $table->string('servicesAr');
-            $table->string('qualification');
-            $table->string('qualificationAr');
-            $table->string('membership');
-            $table->string('membershipAr');
+            $table->string('experience')->nullable();
+            $table->string('experienceAr')->nullable();
+            $table->string('lang')->nullable();
+            $table->string('langAR')->nullable();
+            $table->string('services')->nullable();
+            $table->string('servicesAr')->nullable();
+            $table->string('qualification')->nullable();
+            $table->string('qualificationAr')->nullable();
+            $table->string('membership')->nullable();
+            $table->string('membershipAr')->nullable();
             // $table->string('speciality');
             $table->timestamps();
 
