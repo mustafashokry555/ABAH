@@ -60,7 +60,7 @@ class SettingController extends Controller
 
     function makeComplaint(Request $request) {
         $validator = Validator::make($request->all(), [
-            'subject' => 'required|in:complaint,gratitude,suggestion,technical fault',
+            'subject' => 'required|in:complaint,gratitude,suggestion,technical_fault',
             'name' => 'required|string',
             'mobile' => 'required|numeric|digits:9',
             'comment' => 'required|string',

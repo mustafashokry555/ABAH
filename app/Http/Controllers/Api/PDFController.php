@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class PDFController extends Controller
 {
-    public function RedioPDF($id)
+    public function RedioPDF($id, Request $request) 
     {
         try {
             $data = DB::select('usp_app_apiGetRadioID ?', [
@@ -20,7 +20,9 @@ class PDFController extends Controller
                 $id,
             ]);
             $data->RadiologyResult = $data2[0]->RadiologyResult;
-            $pdf = PDF::loadView('RedioReport', compact('data'));
+            $patient = $request->user();
+            // return View('RedioReport', compact('data', 'patient'));
+            $pdf = PDF::loadView('RedioReport', compact('data', 'patient'));
             return $pdf->download("RedioReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
@@ -28,13 +30,14 @@ class PDFController extends Controller
         }
     }
 
-    public function prescriptionsPDF($id)
+    public function prescriptionsPDF($id, Request $request)
     {
         try {
             $data = DB::select('usp_app_GetPrescriptionsByID ?', [
                 $id,
             ]);
-            $pdf = PDF::loadView('prescription', compact('data'));
+            $patient = $request->user();
+            $pdf = PDF::loadView('prescription', compact('data', 'patient'));
             return $pdf->download("prescription-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
@@ -42,14 +45,15 @@ class PDFController extends Controller
         }
     }
 
-    public function medicalPDF($id)
+    public function medicalPDF($id, Request $request)
     {
         try {
             $data = DB::select('usp_app_apiPatientMedicalReport ?', [
                 $id,
             ]);
             $data = $data[0];
-            $pdf = PDF::loadView('medicalReport', compact('data'));
+            $patient = $request->user();
+            $pdf = PDF::loadView('medicalReport', compact('data', 'patient'));
             return $pdf->download("medicalReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
@@ -66,7 +70,8 @@ class PDFController extends Controller
             $data = collect($data)->filter(function ($item) use ($id) {
                 return $item->LabNo == $id;
             })->values()->first();
-            $pdf = PDF::loadView('labReport', compact('data'));
+            $patient = $request->user();
+            $pdf = PDF::loadView('labReport', compact('data', 'patient'));
             return $pdf->download("labReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
@@ -82,7 +87,8 @@ class PDFController extends Controller
                 $request->billNo,
             ]);
             $data = $data[0];
-            $pdf = PDF::loadView('billPdf', compact('data'));
+            $patient = $request->user();
+            $pdf = PDF::loadView('billPdf', compact('data', 'patient'));
             return $pdf->download("billPDF-$request->billNo.pdf");
         } catch (\Throwable $th) {
             // return $th;

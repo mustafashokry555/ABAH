@@ -65,8 +65,8 @@ return new class extends Migration
                 ChronicChk, CongenitalChk, RTAChk, CheckupChk, WorkRelatedChk, PsychiatricChk, InfertilityChk, PregnancyChk, VaccinationChk, LMP  ,                          
             Durationofillness, GeneralExamination, isSportsRelated , Visit.visitage,            
             dbo.fn_DoctorFullName(@CMODrEmpId) AS CMODoctorName,      
-            (select Prodoc08_Images.dbo.EmployeeSignature.Signature from Prodoc08_Images.dbo.EmployeeSignature WHERE Empid =visit.docincharge)  As DocSign,            
-            (select Prodoc08_Images.dbo.EmployeeSignature.Signature from Prodoc08_Images.dbo.EmployeeSignature WHERE Empid = @CMODrEmpId)  As CMOSign  ,    
+            (select dbo.EmployeeSignature.Signature from dbo.EmployeeSignature WHERE Empid =visit.docincharge)  As DocSign,            
+            (select dbo.EmployeeSignature.Signature from dbo.EmployeeSignature WHERE Empid = @CMODrEmpId)  As CMOSign  ,    
             MRA.MRArabic    
                                 
             FROM         dbo.Visit                  

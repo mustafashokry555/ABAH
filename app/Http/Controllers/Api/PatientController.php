@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use DateTime;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -340,9 +341,9 @@ class PatientController extends Controller
                     // continue the booking
                     $bookResult = $this->addTheAppoint($request);
                     if($bookResult == '1'){
-                        $userphone = Auth::guard('api')->user()->Mobile;
+                        $userphone = Auth::guard('api')->user();
                         if ($userphone) {
-                            $smsRes = $this->sendSms($userphone, $request);
+                            $smsRes = $this->sendSms($userphone->Mobile, $request);
                         }else{
                             $smsRes = $this->sendSms($request->Mobile, $request);
                         }
@@ -402,13 +403,18 @@ class PatientController extends Controller
             'text' => $text,
             'respformat' => 'json',
         ];
-        $client = new Client();
-        $response = $client->request('GET', $url, ['query' => $params]);
-        $responseCode = $response->getStatusCode();
-        $responseBody = json_decode($response->getBody());
+        try {
+            $client = new Client();
+            $response = $client->request('GET', $url, ['query' => $params]);
+            $responseCode = $response->getStatusCode();
+            $responseBody = json_decode($response->getBody());
 
-        if ($responseCode == 200 && isset($responseBody->Response) && is_numeric($responseBody->Response[0]))
-        {return true;} else {return false;}
+            if ($responseCode == 200 && isset($responseBody->Response) && is_numeric($responseBody->Response[0]))
+            {return true;} else {return false;}
+        } catch (ConnectException $e) {
+            // Handle the connection timeout error
+            return false; // Or you can return a custom error message like 'Failed to connect to the SMS gateway. Please try again later.'
+        }
     }
 
     function cancelAppointment(Request $request)

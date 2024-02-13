@@ -51,7 +51,7 @@ return new class extends Migration
                             dbo.fn_GetDocDept(dbo.Visit.DocInCharge) AS Specialty,
                             WD_Prescription_Mst.PreID,WD_Prescription_Details.PreDetailID,Visit.VisitTypeID,WD_Prescription_Mst.PreCode,WD_Prescription_Details.GenericID,
                             convert(varchar,dbo.Visit.VisitDate,105) AS VisitDate ,
-                            dbo.Ctpl_OpInitialAssessment.ReasonforConsultation AS [Cheif Complaint],
+                            dbo.Ctpl_OpInitialAssessment.ReasonforConsultation AS Cheif_Complaint,
                             ISNULL(ivitemgeneric.genericname, '') [Generic Name] ,
                             ISNULL(ivitem.name, '') [Medicine] ,
                             WD_Prescription_Details.dosage AS Dosage ,
