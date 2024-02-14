@@ -10,7 +10,7 @@ class DepartmentController extends Controller
 {
     function index()  {
         try {
-            $data = DB::select('usp_apiGetAllDepartments');
+            $data = DB::select('usp_app_apiGetAllDepartments');
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;

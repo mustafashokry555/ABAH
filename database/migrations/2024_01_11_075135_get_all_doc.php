@@ -40,7 +40,7 @@ return new class extends Migration
 			LEFT JOIN
                 app_doctor_details DD ON EM.EmpID = DD.doctor_id
             WHERE (EM.EmpType = N'Doc')  
-            AND EM.Deactive = 0   
+            AND EM.Deactive = 0 and DM.Department_Name_Arabic IS NOT NULL
             GROUP BY
                 DD.profilePic, EM.EmpID, EM.FirstName, EM.MiddleName, EM.LastName, EM.R_FirstName, EM.R_MiddleName, EM.R_LastName, DM.Department_ID, DM.Department_Name, DM.Department_Name_Arabic
             

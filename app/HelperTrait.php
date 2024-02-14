@@ -9,7 +9,7 @@ function calculateAge($birthdate)
     $age = $currentDate->diff($birthDate);
     
     // Return the age in years
-    return $age->y;
+    return (string)$age->y;
 }
 
 
