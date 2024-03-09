@@ -47,7 +47,10 @@ return new class extends Migration
                         ,(N'د. ' + EM.R_FirstName + ' ' + EM.R_MiddleName + ' ' + EM.R_LastName) AS DoctorNameAr  
                         ,DM.Department_Name AS DoctorSpeciality  
                         ,DM.Department_Name_Arabic AS DoctorSpecialityAr,BM.BillNo,BM.BillDate,    
-            Quantity,Rate,Amount,[Service_Name] as ServiceName,NetAmount as TotalAmount,1 as Id,'Invoice Detail' as Msg    
+            Quantity,Rate,Amount,[Service_Name] as ServiceName,NetAmount as TotalAmount,1 as Id,'Invoice Detail' as Msg    ,
+
+			BD.PatPayable As PatientShare, BD.PatTax As PatientVAT
+
             from Billing_Mst BM inner join BillingDetails BD on BM.Bill_ID=BD.Bill_ID    
             inner join Visit V on V.Visit_Id=BM.Visit_ID    
             inner join Patient P on P.Patientid=V.PatientId    
@@ -62,6 +65,7 @@ return new class extends Migration
             End    
                 
             End
+
         ");
         //  
     }

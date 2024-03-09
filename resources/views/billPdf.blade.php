@@ -20,6 +20,12 @@ Billing Report
         </tr>
     </thead>
     <tbody>
+        <style>
+            td{
+                padding-bottom: 10px;
+                padding-top: 10px;
+            }
+        </style>
         <!-- Add your data rows here -->
         <tr>
             <td>Doctor Name</td>
@@ -27,7 +33,7 @@ Billing Report
         </tr>
         <tr>
             <td>Department Name</td>
-            <td>{{ $data->Department_Name }}</td>
+            <td>{{ $data->DoctorSpeciality }}</td>
         </tr>
         <tr>
             <td>Service Name</td>
@@ -46,8 +52,16 @@ Billing Report
             <td>{{ $data->Amount }}</td>
         </tr>
         <tr>
-            <td>TotalAmount</td>
+            <td>Total Amount</td>
             <td>{{ $data->TotalAmount }}</td>
+        </tr>
+        <tr>
+            <td>Patient Share</td>
+            <td>{{ $data->PatientShare }}</td>
+        </tr>
+        <tr>
+            <td>Patient VAT</td>
+            <td>{{ $data->PatientVAT }}</td>
         </tr>
         <!-- Add more rows as needed -->
     </tbody>

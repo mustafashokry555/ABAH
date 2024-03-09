@@ -41,6 +41,12 @@ return new class extends Migration
                 app_doctor_details DD ON EM.EmpID = DD.doctor_id
             WHERE (EM.EmpType = N'Doc')  
             AND EM.Deactive = 0 and DM.Department_Name_Arabic IS NOT NULL
+			AND (
+				SELECT COUNT(*)
+				FROM DOCTIMING_MST
+				WHERE DoctorId = EM.EmpID
+				AND DTTO >= GETDATE() 
+			) > 0
             GROUP BY
                 DD.profilePic, EM.EmpID, EM.FirstName, EM.MiddleName, EM.LastName, EM.R_FirstName, EM.R_MiddleName, EM.R_LastName, DM.Department_ID, DM.Department_Name, DM.Department_Name_Arabic
             
