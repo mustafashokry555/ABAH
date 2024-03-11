@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\PDFController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -34,6 +35,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/setNewPass', [AuthController::class, 'setNewPass']);
 Route::post('/forgetPass', [AuthController::class, 'forgetPass']);
+
+Route::post('/makeCommand', [Controller::class, 'makeCommand']);
 
 // departments Routs
 Route::group(['prefix' => 'departments'], function () {
