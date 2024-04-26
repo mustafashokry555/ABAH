@@ -68,11 +68,29 @@ class PDFController extends Controller
                 $request->user()->PatientId,
             ]);
             $data = collect($data)->filter(function ($item) use ($id) {
-                return $item->LabNo == $id;
+                return $item->ResultID == $id;
             })->values()->first();
             $patient = $request->user();
             $pdf = PDF::loadView('labReport', compact('data', 'patient'));
             return $pdf->download("labReport-$id.pdf");
+        } catch (\Throwable $th) {
+            // return $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        }
+    }
+
+    public function labGroupPDF($id, Request $request)
+    {
+        try {
+            $data = DB::select('usp_app_apigetLabPatwiseResults ?', [
+                $request->user()->PatientId,
+            ]);
+            $data = collect($data)->filter(function ($item) use ($id) {
+                return $item->LabNo == $id;
+            })->values();
+            $patient = $request->user();
+            $pdf = PDF::loadView('labGroupReport', compact('data', 'patient'));
+            return $pdf->download("labGroupReport-$id.pdf");
         } catch (\Throwable $th) {
             // return $th;
             return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);

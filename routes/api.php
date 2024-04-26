@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/prescriptionsPDF/{id}', [PDFController::class, 'prescriptionsPDF']);
     Route::get('/medicalPDF/{id}', [PDFController::class, 'medicalPDF']);
     Route::get('/labPDF/{id}', [PDFController::class, 'labPDF']);
+    Route::get('/labGroupPDF/{id}', [PDFController::class, 'labGroupPDF']);
     Route::get('/billPDF', [PDFController::class, 'billPDF']);
 
     // patients Routs

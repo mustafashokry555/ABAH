@@ -221,7 +221,10 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['userId', 'password']);
         $credentials['password'] = base64_encode($credentials['password']);
-
+        $patient = Patient::where('Registration_No', $credentials['userId'])->first();
+        if (!$patient ){
+            return response()->json(['error' => 'The Registration Num is wrong!', 'errorAr' => 'رقم الملف غير موجود!', 'status' => 422]);
+        }
         $result = DB::select('EXEC usp_app_apiLoginRegNo ?, ?', [
             $credentials['userId'],
             $credentials['password'],
@@ -232,7 +235,6 @@ class AuthController extends Controller
         } elseif (isset($result[0]->Registration_No) && $result[0]->Registration_No == $credentials['userId']) {
 
             $expirationTime = now()->addDays(7);
-            $patient = Patient::where('Registration_No', $credentials['userId'])->first();
             // $patient->tokens()->delete();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
             return response()->json(['token' => $token, 'status' => 200]);

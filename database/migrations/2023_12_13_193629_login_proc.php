@@ -75,7 +75,7 @@ return new class extends Migration
                         END
                         ELSE
                         BEGIN
-                            SELECT -1 AS Id, 'Your credentials do not match our records' AS Msg;
+                            SELECT -1 AS Id, 'The password is wrong!' AS Msg;
                         END
                     END
                     ELSE

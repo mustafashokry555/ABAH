@@ -53,7 +53,8 @@ return new class extends Migration
             dbo.LABTestResult.Result,  LABSample.LabNo    ,CONVERT(varchar,LABSample.SampleAccptDtTime,106) as ReportDate   ,
                 case (dbo.LABTestResult.ParamNormalRange) when '' then '0-0'  else (dbo.LABTestResult.ParamNormalRange) end as ParamNormalRange,        
                 case  when (dbo.LABTestResult.TestFooter) like '%Test Done At%' then 'OutSourced' else (dbo.LABTestResult.TestFooter) end as Remarks,
-                LABTestResult.ParamTypeID as ParamType,1 as Id
+                LABTestResult.ParamTypeID as ParamType,1 as Id,
+                LABTestResult.ResultID as ResultID
             FROM                  dbo.OrderMst RIGHT OUTER JOIN                                                    
                                 dbo.LABProfileTest INNER JOIN                                                    
                                 dbo.LABProfiles ON dbo.LABProfileTest.ProfID = dbo.LABProfiles.ProfID RIGHT OUTER JOIN                                                    

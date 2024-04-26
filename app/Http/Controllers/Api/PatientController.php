@@ -100,7 +100,8 @@ class PatientController extends Controller
                 $request->user()->PatientId,
             ]);
             foreach ($data as $item) {
-                $item->labPDF = url('/')."/api/labPDF/$item->LabNo";
+                $item->labPDF = url('/')."/api/labPDF/$item->ResultID";
+                $item->labGroupPDF = url('/')."/api/labGroupPDF/$item->LabNo";
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
