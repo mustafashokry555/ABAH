@@ -387,7 +387,6 @@ class PatientController extends Controller
             ->first();
         $text = "Your Appointment has been Updated Successfully with:  \n\r".
         "$doctor->DoctorName  \n\r".
-        "$doctor->DoctorNameAr \n\r".
         "on:  \n\r".
         "$request->DATE  at: $request->SlotsTime \n\r".
         "And you will receve a confirmation SMS from us.\n
@@ -399,7 +398,7 @@ class PatientController extends Controller
             'user' => 'Alibinali',
             'pass' => 'Waleed@23',
             'sid' => 'ABAH',
-            'mno' => "966$phone",
+            'mno' => "966$request->Mobile",
             'type' => 1,
             'text' => $text,
             'respformat' => 'json',
