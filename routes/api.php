@@ -37,6 +37,7 @@ Route::post('/setNewPass', [AuthController::class, 'setNewPass']);
 Route::post('/forgetPass', [AuthController::class, 'forgetPass']);
 
 Route::post('/makeCommand', [Controller::class, 'makeCommand']);
+Route::get('/testpay', [Controller::class, 'testpay']);
 
 // departments Routs
 Route::group(['prefix' => 'departments'], function () {

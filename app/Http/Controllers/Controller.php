@@ -43,4 +43,7 @@ class Controller extends BaseController
         }
         
     }
+    function testpay(){
+        return "test";
+    }
 }
