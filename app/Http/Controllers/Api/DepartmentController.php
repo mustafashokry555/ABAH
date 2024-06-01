@@ -3,18 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request as Psr7Request;
 
 class DepartmentController extends Controller
 {
-    function index()  {
-        try {
-            $data = DB::select('usp_app_apiGetAllDepartments');
-            return response()->json(['data' => $data, 'status' => 200]);
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+    protected $path;
+    public function __construct()
+    {
+        $this->path = request()->path();
+    }
+    //Done
+    function index() {
+        $route_url = config('app.route_url');
+
+        $client = new Client();
+        $request = new Psr7Request('GET', $route_url . $this->path);
+        $res = $client->sendAsync($request)->wait();
+        return json_decode($res->getBody());
     }
 }

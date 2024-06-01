@@ -64,7 +64,7 @@ Route::post('/complaints/make', [SettingController::class,'makeComplaint']);
 
 
 //Garded Routs
-Route::middleware('auth:sanctum')->group(function () {
+
 
     // user PDF
     Route::get('/RedioPDF/{id}', [PDFController::class, 'RedioPDF']);
@@ -112,4 +112,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'doctors'], function () {
         Route::get('/rate', [DoctorController::class,'addRate']);
     });
-});

@@ -469,4 +469,6 @@ class PatientController extends Controller
             return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
         }
     }
+
+    
 }

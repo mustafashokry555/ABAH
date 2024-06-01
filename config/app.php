@@ -18,6 +18,7 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'route_url' => 'http://212.62.102.67:8085/',
     /*
     |--------------------------------------------------------------------------
     | Application Environment
