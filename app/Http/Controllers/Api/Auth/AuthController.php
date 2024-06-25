@@ -96,13 +96,16 @@ class AuthController extends Controller
         // Send SMS with the generated otp to patient mobile number
         $res = $this->sendSms($patient->Mobile ,$otp );
         if($res){
+            $applicationID = DB::table('Application_Mst')->where('AppCode', 'MobApp')->first()->Application_ID; 
+            $patient->UpdatedByApplicationID = $applicationID;
             $patient->OTP = $otp;
             $patient->save();
-                Otp::create([
-                    'patient_id' => $patient->PatientId,
-                    'reason' => $reason,
-                    'otp' => $otp,
-                ]);
+
+            Otp::create([
+                'patient_id' => $patient->PatientId,
+                'reason' => $reason,
+                'otp' => $otp,
+            ]);
 
             $firstDigits = substr($patient->Mobile, 0, 1);
             $lastDigits = substr($patient->Mobile, -3);
@@ -237,6 +240,9 @@ class AuthController extends Controller
             $expirationTime = now()->addDays(7);
             // $patient->tokens()->delete();
             $token = $patient->createToken('auth_token', ['*'], $expirationTime)->plainTextToken;
+            // $applicationID = DB::table('Application_Mst')->where('AppCode', 'MobApp')->first()->Application_ID; 
+            // $patient->UpdatedByApplicationID = $applicationID;
+            // $patient->save();
             return response()->json(['token' => $token, 'status' => 200]);
         }
     }

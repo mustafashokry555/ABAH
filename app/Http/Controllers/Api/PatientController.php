@@ -46,6 +46,8 @@ class PatientController extends Controller
             }
             $patient->ImageURL = NULL;
         }
+        $applicationID = DB::table('Application_Mst')->where('AppCode', 'MobApp')->first()->Application_ID; 
+        $patient->UpdatedByApplicationID = $applicationID;
         // Save changes
         $patient->save();
         return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
@@ -104,29 +106,6 @@ class PatientController extends Controller
                 $item->labGroupPDF = url('/')."/api/labGroupPDF/$item->LabNo";
             }
             return response()->json(['data' => $data, 'status' => 200]);
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
-    }
-
-    function appointment(Request $request)
-    {
-        try {
-            $PatientId = $request->user()->PatientId;
-            $appointments = DB::table("Ds_PatientAppoinmentTemperary")
-            ->join('Employee_Mst', 'Ds_PatientAppoinmentTemperary.DoctorID', '=', 'Employee_Mst.EmpID')
-            ->join('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
-            ->where('Ds_PatientAppoinmentTemperary.PatientID', $PatientId,)
-            ->select(
-                'Ds_PatientAppoinmentTemperary.*',
-                DB::raw("'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName AS DoctorName"),
-                DB::raw("N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName AS DoctorNameAr"),
-                DB::raw("Department_Mst.Department_Name AS DoctorSpeciality"),
-                DB::raw("Department_Mst.Department_Name_Arabic AS DoctorSpecialityAr"),
-                )
-            ->get();
-            return response()->json(['data' => $appointments, 'status' => 200]);
         } catch (\Throwable $th) {
             // return $th;
             return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
@@ -214,8 +193,49 @@ class PatientController extends Controller
         }
     }
 
+    function medicalRport(Request $request) {
+        
+        try {
+            $data = DB::select('usp_app_apiPatientMedicalReportById ?', [
+                $request->user()->PatientId
+            ]);
+            foreach ($data as $item) {
+                $item->medicalPDF = url('/')."/api/medicalPDF/$item->Visit_ID";
+            }
+            return response()->json(['data' => $data, 'status' => 200]);
+        } catch (\Throwable $th) {
+            // throw $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        }
+    }
+
+
+    function appointment(Request $request)
+    {
+        try {
+            $PatientId = $request->user()->PatientId;
+            $appointments = DB::table("Ds_PatientAppoinmentTemperary")
+            ->join('Employee_Mst', 'Ds_PatientAppoinmentTemperary.DoctorID', '=', 'Employee_Mst.EmpID')
+            ->join('Department_Mst', 'Employee_Mst.Department_ID', '=', 'Department_Mst.Department_ID')
+            ->where('Ds_PatientAppoinmentTemperary.PatientID', $PatientId,)
+            ->select(
+                'Ds_PatientAppoinmentTemperary.*',
+                DB::raw("'Dr. ' + Employee_Mst.FirstName + ' ' + Employee_Mst.MiddleName + ' ' + Employee_Mst.LastName AS DoctorName"),
+                DB::raw("N'د. ' + Employee_Mst.R_FirstName + ' ' + Employee_Mst.R_MiddleName + ' ' + Employee_Mst.R_LastName AS DoctorNameAr"),
+                DB::raw("Department_Mst.Department_Name AS DoctorSpeciality"),
+                DB::raw("Department_Mst.Department_Name_Arabic AS DoctorSpecialityAr"),
+                )
+            ->get();
+            return response()->json(['data' => $appointments, 'status' => 200]);
+        } catch (\Throwable $th) {
+            // return $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        }
+    }
+
     function addTheAppoint(Request $request)
     {
+        $applicationID = DB::table('User_Mst')->where('UserName', 'MobApp')->first()->UserID;
         // get from & to dateTime
         list($fromTime, $toTime) = explode(" To ", $request->SlotsTime);
         $date = new DateTime($request->DATE);
@@ -250,6 +270,7 @@ class PatientController extends Controller
             'Duration' => 0,
             'Loc_Id' => 1,
             'app_date' => $date->format('Y-m-d') . " 00:00:00.000",
+            'InsertedByUserID' => $applicationID,
         ];
 
         $user = Auth::guard('api')->user();
@@ -288,7 +309,7 @@ class PatientController extends Controller
             }
             // case the patient is Gest
             $row = array_merge($row, [
-                "PatientID" => -1,
+                "PatientID" => 0,
                 "Firstname" => $request->Firstname,
                 "Middlename" => $request->Middlename,
                 "LastName" => $request->LastName,
@@ -454,19 +475,4 @@ class PatientController extends Controller
         }
     }
 
-    function medicalRport(Request $request) {
-        
-        try {
-            $data = DB::select('usp_app_apiPatientMedicalReportById ?', [
-                $request->user()->PatientId
-            ]);
-            foreach ($data as $item) {
-                $item->medicalPDF = url('/')."/api/medicalPDF/$item->Visit_ID";
-            }
-            return response()->json(['data' => $data, 'status' => 200]);
-        } catch (\Throwable $th) {
-            // throw $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
-    }
 }
