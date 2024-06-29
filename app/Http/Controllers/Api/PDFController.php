@@ -3,114 +3,136 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request as Psr7Request;
 use Illuminate\Http\Request;
-use PDF;
-use Illuminate\Support\Facades\DB;
 
 class PDFController extends Controller
 {
+    protected $path;
+    public function __construct()
+    {
+        $this->path = request()->path();
+    }
+    // Done
     public function RedioPDF($id, Request $request) 
     {
-        try {
-            $data = DB::select('usp_app_apiGetRadioID ?', [
-                $id,
-            ]);
-            $data = $data[0];
-            $data2 = DB::select('usp_app_apiGetPatientRadioResult ?', [
-                $id,
-            ]);
-            $data->RadiologyResult = $data2[0]->RadiologyResult;
-            $patient = $request->user();
-            // return View('RedioReport', compact('data', 'patient'));
-            $pdf = PDF::loadView('RedioReport', compact('data', 'patient'));
-            return $pdf->download("RedioReport-$id.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $request = new Psr7Request('GET', $route_url . $this->path, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="RedioReport.pdf"');
     }
-
+    // Done
     public function prescriptionsPDF($id, Request $request)
     {
-        try {
-            $data = DB::select('usp_app_GetPrescriptionsByID ?', [
-                $id,
-            ]);
-            $patient = $request->user();
-            $pdf = PDF::loadView('prescription', compact('data', 'patient'));
-            return $pdf->download("prescription-$id.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $request = new Psr7Request('GET', $route_url . $this->path, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="prescription.pdf"');
     }
-
+    // Done
     public function medicalPDF($id, Request $request)
     {
-        try {
-            $data = DB::select('usp_app_apiPatientMedicalReport ?', [
-                $id,
-            ]);
-            $data = $data[0];
-            $patient = $request->user();
-            $pdf = PDF::loadView('medicalReport', compact('data', 'patient'));
-            return $pdf->download("medicalReport-$id.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $request = new Psr7Request('GET', $route_url . $this->path, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="medicalReport.pdf"');
     }
-
+    // Done
     public function labPDF($id, Request $request)
     {
-        try {
-            $data = DB::select('usp_app_apigetLabPatwiseResults ?', [
-                $request->user()->PatientId,
-            ]);
-            $data = collect($data)->filter(function ($item) use ($id) {
-                return $item->ResultID == $id;
-            })->values()->first();
-            $patient = $request->user();
-            $pdf = PDF::loadView('labReport', compact('data', 'patient'));
-            return $pdf->download("labReport-$id.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $request = new Psr7Request('GET', $route_url . $this->path, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="labReport.pdf"');
     }
-
+    // Done
     public function labGroupPDF($id, Request $request)
     {
-        try {
-            $data = DB::select('usp_app_apigetLabPatwiseResults ?', [
-                $request->user()->PatientId,
-            ]);
-            $data = collect($data)->filter(function ($item) use ($id) {
-                return $item->LabNo == $id;
-            })->values();
-            $patient = $request->user();
-            $pdf = PDF::loadView('labGroupReport', compact('data', 'patient'));
-            return $pdf->download("labGroupReport-$id.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
-        }
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $request = new Psr7Request('GET', $route_url . $this->path, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="labGroupReport.pdf"');
     }
-
+    // Done
     public function billPDF(Request $request)
     {
-        // return $request->billNo;
-        try {
-            $data = DB::select('usp_app_GetBillByNo ?', [
-                $request->billNo,
-            ]);
-            $data = $data[0];
-            $patient = $request->user();
-            $pdf = PDF::loadView('billPdf', compact('data', 'patient'));
-            return $pdf->download("billPDF-$request->billNo.pdf");
-        } catch (\Throwable $th) {
-            // return $th;
-            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $options = '?';
+        foreach ($request->all() as $name => $contents) {
+            $options = $options . $name . '=' . $contents . '&';
         }
+        $request = new Psr7Request('GET', $route_url . $this->path . $options, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="billPDF.pdf"');
     }
+    // Done
+    public function billDatePDF(Request $request)
+    {
+        $token = $request->header('Authorization');
+        $route_url = config('app.route_url');
+        $client = new Client();
+        $headers = [
+            'Authorization' => $token ,
+        ];
+        $options = '?';
+        foreach ($request->all() as $name => $contents) {
+            $options = $options . $name . '=' . $contents . '&';
+        }
+        $request = new Psr7Request('GET', $route_url . $this->path . $options, $headers);
+        $res = $client->sendAsync($request)->wait();
+        $pdf = $res->getBody();
+        return response($pdf, 200)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="billDatePdf.pdf"');
+    }
+
 }

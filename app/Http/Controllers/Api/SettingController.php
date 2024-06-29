@@ -44,6 +44,14 @@ class SettingController extends Controller
         $res = $client->sendAsync($request, $options)->wait();
         return json_decode($res->getBody());
     }
+    public function showImage($filename)
+    {
+        $path = storage_path('app/public/patient/profileImg/' . $filename);
 
+        if (!file_exists($path)) {
+            abort(404);
+        }
 
+        return response()->file($path);
+    }
 }
