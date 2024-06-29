@@ -97,11 +97,19 @@
                 {{-- <td>Bill Number</td>
                 <td>{{ $data->BillNo }}</td> --}}
                 <td>Bill Number</td>
-                <td>{{ $data->BillNo }}</td>
+                <td>{{ $data[0]->BillNo }}</td>
             </tr>
             <tr>
                 <td>Bill Date</td>
-                <td>{{ $data->BillDate }}</td>
+                <td>{{ $data[0]->BillDate }}</td>
+            </tr>
+            <tr>
+                <td>Doc.Name</td>
+                <td>{{ $data[0]->DoctorName }}</td>
+            </tr>
+            <tr>
+                <td>Dep.Name</td>
+                <td>{{ $data[0]->DoctorSpeciality }}</td>
             </tr>
             <!-- Add more rows with relevant data -->
         </tbody>
@@ -110,8 +118,15 @@
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Desc</th>
+                {{-- <th>Doc.Name</th>
+                <th>Dep.Name</th> --}}
+                <th>Service Name</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Tot.Amount</th>
+                <th>Patient Share</th>
+                <th>Patient VAT</th>
+                {{-- <th>Desc</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -122,43 +137,19 @@
                 }
             </style>
             <!-- Add your data rows here -->
-            <tr>
-                <td>Doctor Name</td>
-                <td>{{ $data->DoctorName }}</td>
-            </tr>
-            <tr>
-                <td>Department Name</td>
-                <td>{{ $data->DoctorSpeciality }}</td>
-            </tr>
-            <tr>
-                <td>Service Name</td>
-                <td>{{ $data->ServiceName }}</td>
-            </tr>
-            {{-- <tr>
-                <td>Bill Date</td>
-                <td>{{ $data->BillDate }}</td>
-            </tr> --}}
-            <tr>
-                <td>Rate</td>
-                <td>{{ $data->Rate }}</td>
-            </tr>
-            <tr>
-                <td>Amount</td>
-                <td>{{ $data->Amount }}</td>
-            </tr>
-            <tr>
-                <td>Total Amount</td>
-                <td>{{ $data->TotalAmount }}</td>
-            </tr>
-            <tr>
-                <td>Patient Share</td>
-                <td>{{ $data->PatientShare }}</td>
-            </tr>
-            <tr>
-                <td>Patient VAT</td>
-                <td>{{ $data->PatientVAT }}</td>
-            </tr>
-            <!-- Add more rows as needed -->
+            @foreach ($data as $row)
+                <tr>
+                    {{-- <td>{{ $row->DoctorName }}</td>
+                    <td>{{ $row->DoctorSpeciality }}</td> --}}
+                    <td>{{ $row->ServiceName }}</td>
+                    <td>{{ $row->Rate }}</td>
+                    <td>{{ $row->Amount }}</td>
+                    <td>{{ $row->TotalAmount }}</td>
+                    <td>{{ $row->PatientShare }}</td>
+                    <td>{{ $row->PatientVAT }}</td>
+                </tr>
+            @endforeach
+            
         </tbody>
     </table>
 </body>

@@ -11,10 +11,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
+    function userData (Request $request) {
+        $data = $request->user();
+        $data->Age = calculateAge($data->Date_Of_Birth);
+        if($data->ImageURL != NULL){
+            if (Storage::exists($data->ImageURL)) {
+                $data->ImageURL = url('/').Storage::url($data->ImageURL);
+            }else{
+                $data->ImageURL = NULL;
+            }
+        }else{
+            $data->ImageURL = NULL;
+        }
+        return response()->json(['data' => $data, 'status' => 200]);
+    }
 
     public function register(Request $request)
     {
@@ -67,7 +83,6 @@ class AuthController extends Controller
             ]);
         }
     }
-
 
     public function generateOtp(Patient $patient, $reason)
     {

@@ -50,7 +50,7 @@ class PatientController extends Controller
         $patient->UpdatedByApplicationID = $applicationID;
         // Save changes
         $patient->save();
-        return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
+        // return response()->json(['message' => 'Patient data updated successfully', 'status' => 200]);
         return response()->json([
             'message' => "Patient data updated successfully.",
             'messageAr' => "تم التحديث بنجاح.",
@@ -140,13 +140,15 @@ class PatientController extends Controller
         //     return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
         // }
         try {
-            $data = DB::select('usp_app_BollByID ?, ?', [
+            $data = DB::select('usp_app_AllBill ?, ?', [
                 $request->user()->Registration_No,
                 $request->user()->Hospital_ID,
             ]);
             foreach ($data as $item) {
-                $queryParameters = http_build_query(['billNo' => $item->BillNo]);
+                $queryParameters = http_build_query(['ID' => $item->ID]);
                 $item->billPDF = url("/api/billPDF?$queryParameters");
+                $queryParameters2 = http_build_query(['billNo' => $item->BillNo]);
+                $item->billDatePDF = url("/api/billDatePDF?$queryParameters2");
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {

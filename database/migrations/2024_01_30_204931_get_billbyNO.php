@@ -13,16 +13,15 @@ return new class extends Migration
     public function up(): void
     {
         DB::unprepared("
-            IF OBJECT_ID('usp_app_GetBillByNo', 'P') IS NOT NULL
+            IF OBJECT_ID('usp_app_BillByNo', 'P') IS NOT NULL
             BEGIN
-                DROP PROCEDURE usp_app_GetBillByNo;
+                DROP PROCEDURE usp_app_BillByNo;
             END
         ");
 
-
         DB::unprepared("
-            create proc usp_app_GetBillByNo
-            @BillNo as nvarchar(50)    
+            create proc [dbo].[usp_app_BillByNo]
+            @BillNo as nvarchar(50)
             AS    
             Declare @Count as Int    
             Begin    
@@ -34,7 +33,7 @@ return new class extends Migration
             inner join Employee_Mst EM on EM.EmpId=V.DocInCharge    
             inner join Department_Mst DM on DM.Department_Id=V.DepartmentId    
             inner join Service_mst SM on BD.ServiceId=SM.Service_Id    
-            Where BM.BillNo = @BillNo
+            Where BM.BillNo=@BillNo   
                 
                 
             -- [dbo].fn_DoctorfullName(V.DocInCharge) as DoctorName,BM.BillNo,BM.BillDate,DM.Department_Name,    
@@ -49,23 +48,25 @@ return new class extends Migration
                         ,DM.Department_Name_Arabic AS DoctorSpecialityAr,BM.BillNo,BM.BillDate,    
             Quantity,Rate,Amount,[Service_Name] as ServiceName,NetAmount as TotalAmount,1 as Id,'Invoice Detail' as Msg    ,
 
-			BD.PatPayable As PatientShare, BD.PatTax As PatientVAT
+			BD.PatPayable As PatientShare, BD.PatTax As PatientVAT, v.VisitDate As VisitDate
 
             from Billing_Mst BM inner join BillingDetails BD on BM.Bill_ID=BD.Bill_ID    
             inner join Visit V on V.Visit_Id=BM.Visit_ID    
             inner join Patient P on P.Patientid=V.PatientId    
             inner join Employee_Mst EM on EM.EmpId=V.DocInCharge    
             inner join Department_Mst DM on DM.Department_Id=V.DepartmentId    
-            inner join Service_mst SM on BD.ServiceId=SM.Service_Id       
-            Where BM.BillNo = @BillNo   
+            inner join Service_mst SM on BD.ServiceId=SM.Service_Id    
+            Where BM.BillNo=@BillNo order by BM.BillDate desc
             End    
             Else    
             Begin    
             Select -1 as Id,'No Invoice Details Available.' as Msg    
             End    
                 
-            End  
+            End
+
         ");
+        //  
     }
 
     /**

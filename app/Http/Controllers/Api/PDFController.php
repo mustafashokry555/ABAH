@@ -101,13 +101,29 @@ class PDFController extends Controller
     {
         // return $request->billNo;
         try {
-            $data = DB::select('usp_app_GetBillByNo ?', [
-                $request->billNo,
+            $data = DB::select('usp_app_GetBillByID ?', [
+                $request->ID,
             ]);
             $data = $data[0];
             $patient = $request->user();
             $pdf = PDF::loadView('billPdf', compact('data', 'patient'));
-            return $pdf->download("billPDF-$request->billNo.pdf");
+            return $pdf->download("billPDF-$request->ID.pdf");
+        } catch (\Throwable $th) {
+            // return $th;
+            return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);
+        }
+    }
+
+    public function billDatePDF(Request $request)
+    {
+        // return $request->billNo;
+        try {
+            $data = DB::select('usp_app_BillByNo ?', [
+                $request->billNo,
+            ]);
+            $patient = $request->user();
+            $pdf = PDF::loadView('billDatePdf', compact('data', 'patient'));
+            return $pdf->download("billDatePdf-$request->billNo.pdf");
         } catch (\Throwable $th) {
             // return $th;
             return response()->json(['error' => 'Database Error !', 'errorAr' => 'خطأ في قاعده البيانات!','status' => 500]);

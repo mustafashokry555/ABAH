@@ -13,16 +13,16 @@ return new class extends Migration
     public function up(): void
     {
         DB::unprepared("
-            IF OBJECT_ID('usp_app_BollByID', 'P') IS NOT NULL
+            IF OBJECT_ID('usp_app_GetBillByID', 'P') IS NOT NULL
             BEGIN
-                DROP PROCEDURE usp_app_BollByID;
+                DROP PROCEDURE usp_app_GetBillByID;
             END
         ");
 
+
         DB::unprepared("
-            create proc [dbo].[usp_app_BollByID]   
-            @RegistrationNo as nvarchar(50),    
-            @LocId as Int   
+            create proc usp_app_GetBillByID
+            @ID as nvarchar(50)    
             AS    
             Declare @Count as Int    
             Begin    
@@ -34,7 +34,7 @@ return new class extends Migration
             inner join Employee_Mst EM on EM.EmpId=V.DocInCharge    
             inner join Department_Mst DM on DM.Department_Id=V.DepartmentId    
             inner join Service_mst SM on BD.ServiceId=SM.Service_Id    
-            Where BM.Registration_No=@RegistrationNo   
+            Where BD.BillDetailID = @ID
                 
                 
             -- [dbo].fn_DoctorfullName(V.DocInCharge) as DoctorName,BM.BillNo,BM.BillDate,DM.Department_Name,    
@@ -56,18 +56,16 @@ return new class extends Migration
             inner join Patient P on P.Patientid=V.PatientId    
             inner join Employee_Mst EM on EM.EmpId=V.DocInCharge    
             inner join Department_Mst DM on DM.Department_Id=V.DepartmentId    
-            inner join Service_mst SM on BD.ServiceId=SM.Service_Id    
-            Where BM.Registration_No=@RegistrationNo order by BM.BillDate desc
+            inner join Service_mst SM on BD.ServiceId=SM.Service_Id       
+            Where BD.BillDetailID = @ID   
             End    
             Else    
             Begin    
             Select -1 as Id,'No Invoice Details Available.' as Msg    
             End    
                 
-            End
-
+            End  
         ");
-        //  
     }
 
     /**

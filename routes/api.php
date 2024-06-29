@@ -51,7 +51,7 @@ Route::group(['prefix' => 'doctors'], function () {
     Route::post('/avilSlots', [DoctorController::class,'avilSlots']);
 });
 
-// patients Routs
+// patients & Guest Routs
 Route::group(['prefix' => 'patient'], function () {
     Route::post('/makeAppointment', [PatientController::class,'makeAppointment']);
     Route::post('/cancelAppointment', [PatientController::class,'cancelAppointment']);
@@ -73,23 +73,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/labPDF/{id}', [PDFController::class, 'labPDF']);
     Route::get('/labGroupPDF/{id}', [PDFController::class, 'labGroupPDF']);
     Route::get('/billPDF', [PDFController::class, 'billPDF']);
+    Route::get('/billDatePDF', [PDFController::class, 'billDatePDF']);
 
     // patients Routs
     Route::group(['prefix' => 'patient'], function () {
-        Route::post('/info', function (Request $request) {
-            $data = $request->user();
-            $data->Age = calculateAge($data->Date_Of_Birth);
-            if($data->ImageURL != NULL){
-                if (Storage::exists($data->ImageURL)) {
-                    $data->ImageURL = url('/').Storage::url($data->ImageURL);
-                }else{
-                    $data->ImageURL = NULL;
-                }
-            }else{
-                $data->ImageURL = NULL;
-            }
-            return response()->json(['data' => $data, 'status' => 200]);
-        });
+        Route::post('/info', [AuthController::class,'userData']);
         Route::post('/editProfile', [PatientController::class,'editProfile']);
         Route::get('/insurance', [PatientController::class,'insurance']);
         Route::get('/radio/reports', [PatientController::class,'radiologyReports']);
