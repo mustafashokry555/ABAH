@@ -41,9 +41,9 @@ class DoctorController extends Controller
 
             foreach($data as $value){
                 if($value->DoctorImg != NULL){
-                    $value->DoctorImg = "public/doctor/profileImg/".basename($value->DoctorImg);
-                    if (Storage::exists($value->DoctorImg)) {
-                        $value->DoctorImg = url('/').Storage::url($value->DoctorImg);
+                    $DoctorImg = "public/doctor/profileImg/".basename($value->DoctorImg);
+                    if (Storage::exists($DoctorImg)) {
+                        $value->DoctorImg = config('app.api_route')."/api/getImg/doctor?name=$value->DoctorImg";
                     }else{
                         $value->DoctorImg = NULL;
                     }
@@ -85,9 +85,9 @@ class DoctorController extends Controller
             )
             ->first();
             if($data->profilePic != NULL){
-                $data->profilePic = "public/doctor/profileImg/".basename($data->profilePic);
-                if (Storage::exists($data->profilePic)) {
-                    $data->profilePic = url('/').Storage::url($data->profilePic);
+                $profilePic = "public/doctor/profileImg/".basename($data->profilePic);
+                if (Storage::exists($profilePic)) {
+                    $data->profilePic = config('app.api_route')."/api/getImg/doctor?name=$data->profilePic";
                 }else{
                     $data->profilePic = NULL;
                 }

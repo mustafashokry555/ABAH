@@ -39,7 +39,7 @@ class PatientController extends Controller
             $imageName = "$patient->PatientId-$patient->Registration_No."
                     . $image->getClientOriginalExtension();
             $image->move('storage/patient/profileImg', $imageName);
-            $patient->ImageURL = "public/patient/profileImg/$imageName";
+            $patient->ImageURL = "$imageName";
         }elseif ($request->has('deleteImg') && $request->deleteImg) {
             if ($patient->ImageURL != NULL && Storage::exists($patient->ImageURL)) {
                 Storage::delete($patient->ImageURL);
@@ -86,7 +86,7 @@ class PatientController extends Controller
                 $request->user()->Hospital_ID,
             ]);
             foreach ($data as $item) {
-                $item->resultPDF = url('/')."/api/RedioPDF/$item->OrdDtlID";
+                $item->resultPDF = config('app.api_route')."/api/RedioPDF/$item->OrdDtlID";
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -102,8 +102,8 @@ class PatientController extends Controller
                 $request->user()->PatientId,
             ]);
             foreach ($data as $item) {
-                $item->labPDF = url('/')."/api/labPDF/$item->ResultID";
-                $item->labGroupPDF = url('/')."/api/labGroupPDF/$item->LabNo";
+                $item->labPDF = config('app.api_route')."/api/labPDF/$item->ResultID";
+                $item->labGroupPDF = config('app.api_route')."/api/labGroupPDF/$item->LabNo";
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -120,7 +120,7 @@ class PatientController extends Controller
                 $request->user()->Hospital_ID,
             ]);
             foreach ($data as $item) {
-                $item->prescriptionPDF = url('/')."/api/prescriptionsPDF/$item->PreID";
+                $item->prescriptionPDF = config('app.api_route')."/api/prescriptionsPDF/$item->PreID";
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {
@@ -202,7 +202,7 @@ class PatientController extends Controller
                 $request->user()->PatientId
             ]);
             foreach ($data as $item) {
-                $item->medicalPDF = url('/')."/api/medicalPDF/$item->Visit_ID";
+                $item->medicalPDF = config('app.api_route')."/api/medicalPDF/$item->Visit_ID";
             }
             return response()->json(['data' => $data, 'status' => 200]);
         } catch (\Throwable $th) {

@@ -6,6 +6,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
 {
@@ -45,5 +47,23 @@ class Controller extends BaseController
     }
     function testpay(){
         return "test";
+    }
+    function getImg($folder, Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors(), 'errorAr' => $validator->errors(), 'status' => 422]);
+        }
+
+        $name = $request->input('name');
+        $filePath = 'public/' . $folder . '/profileImg/' . $name;
+
+        if (!Storage::exists($filePath)) {
+            return response()->json(['error' => 'Image not found', 'errorAr' => 'لايوجد صوره', 'status' => 404]);
+        }
+
+        $file = Storage::path($filePath);
+        return response()->file($file);
     }
 }

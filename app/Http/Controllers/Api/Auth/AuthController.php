@@ -21,8 +21,9 @@ class AuthController extends Controller
         $data = $request->user();
         $data->Age = calculateAge($data->Date_Of_Birth);
         if($data->ImageURL != NULL){
-            if (Storage::exists($data->ImageURL)) {
-                $data->ImageURL = url('/').Storage::url($data->ImageURL);
+            $ImageURL = "public/patient/profileImg/".basename($data->ImageURL);
+            if (Storage::exists($ImageURL)) {
+                $data->ImageURL = config('app.api_route')."/api/getImg/patient?name=$data->ImageURL";
             }else{
                 $data->ImageURL = NULL;
             }

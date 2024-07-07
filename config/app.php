@@ -17,6 +17,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'api_route' => 'https://www.alibinali.sa/Apps/public',
 
     /*
     |--------------------------------------------------------------------------

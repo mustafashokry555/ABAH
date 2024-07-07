@@ -38,6 +38,7 @@ Route::post('/forgetPass', [AuthController::class, 'forgetPass']);
 
 Route::post('/makeCommand', [Controller::class, 'makeCommand']);
 Route::get('/testpay', [Controller::class, 'testpay']);
+Route::get('/getImg/{folder}', [Controller::class, 'getImg']);
 
 // departments Routs
 Route::group(['prefix' => 'departments'], function () {
