@@ -54,7 +54,7 @@ return new class extends Migration
                 case (dbo.LABTestResult.ParamNormalRange) when '' then '0-0'  else (dbo.LABTestResult.ParamNormalRange) end as ParamNormalRange,        
                 case  when (dbo.LABTestResult.TestFooter) like '%Test Done At%' then 'OutSourced' else (dbo.LABTestResult.TestFooter) end as Remarks,
                 LABTestResult.ParamTypeID as ParamType,1 as Id,
-                LABTestResult.ResultID as ResultID
+                LABTestResult.ResultID as ResultID, dbo.LABTestResult.VisitId as visit_id, dbo.Visit.TypeOfVisit
             FROM                  dbo.OrderMst RIGHT OUTER JOIN                                                    
                                 dbo.LABProfileTest INNER JOIN                                                    
                                 dbo.LABProfiles ON dbo.LABProfileTest.ProfID = dbo.LABProfiles.ProfID RIGHT OUTER JOIN                                                    
@@ -70,10 +70,11 @@ return new class extends Migration
                 dbo.Orderdtl ON Orderdtl.Orddtlid =  labtestresult.OrderDtlId LEFT OUTER JOIN                                     
                                 dbo.LABSampleDtl ON dbo.Labtestresult.SampleDtlID =  dbo.LABSampleDtl.SmpDtlNo        
                 Inner Join dbo.patient on dbo.Patient.PatientId=dbo.LABTestResult.PatientID        
+				LEFT JOIN dbo.Visit ON dbo.Labtestresult.VisitId =  dbo.Visit.Visit_ID
                     -- LEFT OUTER JOIN                                 
                                         
             WHERE   LABTestResult.PatientID=@PatientID        
-            
+            and Visit.TypeOfVisit <> 'IPD'
             and LABTestResult.Result not like  '' Order by LABSample.SampleAccptDtTime desc      
                 End
             Else
